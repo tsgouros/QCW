@@ -40,18 +40,16 @@ convertDateToInteger <- function(year, month) {
 ##
 ##
 ## First, incorporate the data from QC water.
-if (recompile) source("intake.r");
+if (recompile) source("intake-new.r");
 
-## This brings the pre-2023 data into a tibble called 'big'.
-if (recompile.pre.2023) source("intake-2.r");
 ##
 ## Read the property data from Maricopa and Pinal counties.
-if (recompile.county) source("~/osa/20/queenscreek/read-county-data.r",
-                             chdir=TRUE);
+##if (recompile.county) source("~/osa/20/queenscreek/read-county-data.r",
+##                             chdir=TRUE);
 ## This creates a big array called 'prop'.
 
 waterTable <- billTable %>%
-    ## April had stolen some bills from March in 2023. Maybe May, too? 
+    ## April 2023 had stolen some bills from March in 2023. Maybe May, too? 
     mutate(billMonth=ifelse(billDate>ymd("2023-03-01")&
                             billDate<ymd("2023-04-12"),
                             3,
@@ -93,7 +91,7 @@ waterTable <- billTable %>%
                                   "Unknown")))))))))
 
 ## Bring in precipitation and temperature records
-source("rain.r")
+##source("rain.r")
 
 ## Make a usage record with quarterly averages to match the seasonal
 ## weather records. These are 3-month seasons, starting with July,
@@ -101,5 +99,5 @@ source("rain.r")
 
 ## Combine the big and waterTable usage records. Watch out, this one
 ## can take a long time, depending on the flags set over there.
-if (prelim) source("~/osa/20/queenscreek/master-taz.r", chdir=TRUE);
+##if (prelim) source("~/osa/20/queenscreek/master-taz.r", chdir=TRUE);
 
