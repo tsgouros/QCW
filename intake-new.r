@@ -172,23 +172,12 @@ readingTable24 <- read.csv("data/2024 Jan to Sep BIF016 report.csv",
   filter(canceled=="No");
 
 
-readingTable <- readingTable19 %>%
-  rbind(readingTable20,readingTable21,readingTable22,readingTable23,readingTable24 %>%
-          select(billNumber, account, service,
-                 meter,readType,currentReading,
-                 readStatus, billTyple, cycle,
-                 book, readingDate, sequenceNumber,
-                 peakTime, readingID, processed, supplier,
-                 customer, previousReading, notes, consumption,
-                 multiplier1, multiplier2, units, mv90Channel,
-                 lossFactor,serviceID,previousReadingDate,
-                 workerCode, interval, billingInterval, serviceOrder,
-                 meterTroubleCode1, meterTroubleCode2, validated, days,
-                 demandFactor, canceled, serviceMultiplier1,
-                 serviceMultiplier2, consumptionDiscount, discountCode,
-                 allocation, factor, overrideconsumption, useOverride,
-                 useOverrideReason, billedConsumption, isbilled,readingMonth,
-                 previousReadingMonth));
+readingTable <- rbind(readingTable19,
+                      readingTable20,
+                      readingTable21,
+                      readingTable22,
+                      readingTable23,
+                      readingTable24)
 
 cat("done with readingtable\n")
 
@@ -225,7 +214,7 @@ customerTable <- read.csv("data/Updated BIF003 Report.csv",
   mutate(moveInDate=mdy(moveInDate), moveInMonth=month(moveInDate),
          moveOutDate=mdy(moveOutDate), moveOutMonth=month(moveOutDate));
 
-cat("done with addressTable\n");
+cat("done with customerTable\n");
 
 billTable19 <- read.csv("data/2019 BIF951 Report.csv",
                         col.names=c("billNumber","billDate","accountType",
@@ -317,17 +306,11 @@ billTable24 <- read.csv("data/2024 Jan to Sep BIF951 report.csv",
   mutate(billDate=mdy(billDate),
          billMonth=month(billDate));
 
-billTable <- billTable19 %>%
-  rbind(billTable20,billTable21,billTable22,billTable23,billTable24 %>%
-          select(billNumber,billDate,accountType,
-                 needsPayment,batchID,bif951pk,
-                 billPrint,billGroup,billStat,billType,
-                 chgBill,cycle,book,cancel,account,
-                 customer,customerAcctID,dueDate,
-                 paymentProfile,processed,serAdd,
-                 balanceForward,previousBilling,
-                 sinceLastBill,currentTrans,cancelledBilling,
-                 amountDue,addressType,address1,
-                 address2,address3,address4,address5,address6,billMonth));
+billTable <- rbind(billTable19,
+                   billTable20,
+                   billTable21,
+                   billTable22,
+                   billTable23,
+                   billTable24)
 
 cat("done with billTable\n");
