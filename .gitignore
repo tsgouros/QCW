@@ -2,6 +2,10 @@
 .Rhistory
 .Rapp.history
 
+## I don't think we want to commit data files to git.
+.csv
+.xlsx
+
 # Session Data files
 .RData
 .RDataTmp
