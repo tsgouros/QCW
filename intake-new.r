@@ -177,7 +177,16 @@ readingTable <- rbind(readingTable19,
                       readingTable21,
                       readingTable22,
                       readingTable23,
-                      readingTable24)
+                      readingTable24) %>%
+    ## This next step is because the reading data in the raw data is in the
+    ## form "53,200,00" instead of just being "53200", so this field is read
+    ## as a character string, not a number.
+    mutate(previousReading=as.numeric(gsub(".00$","",
+                                           gsub(",","",previousReading))),
+           currentReading=as.numeric(gsub(".00$","",
+                                          gsub(",","",currentReading))),
+           consumption=as.numeric(gsub(".00$","",
+                                       gsub(",","",consumption))))
 
 cat("done with readingtable\n")
 
