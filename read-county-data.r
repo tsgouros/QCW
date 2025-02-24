@@ -118,26 +118,24 @@ check.numeric <- function(v = NULL, na.rm = FALSE, only.integer = FALSE,
     }
 }
 
-##updated 123-154 on 2-24 to read Pinal data in Excel, unsure about row156 test
+##updated 123-154 on 2-24 to read Pinal data in Excel, set names before running read_excel
 
-read.pinal.data <- read_excel("data/countyData/Town of Queen Creek pools 2025 01.23.25.xlsx", skip=1,
-
-      col_names=c("acct", "parcel", "parcelid", "accttype",
-                  "propertytype", "impconditiontype", "impquality",
-                  "implegalclass", "primarybltasdescription", "yearbuilt",
-                  "physicalage", "adjustedyearbuilt", "effectiveage",
-                  "totalimpsf", "residentialsf", "commercialsf", "condoimpsf",
-                  "landlegalclass", "landnetacrecount", "taxareacode", "fcv",
-                  "impvalue", "landvalue", "receptionno", "saledate", "saleprice",
-                  "ownername1", "ownername2", "co", "mailingaddress", "ownercity",
-                  "ownerstatecode", "ownerzipcode", "ownerprovince",
-                  "ownerpostalcode", "ownercountry", "propertystreetno",
-                  "propertypredirection", "propertystreetname",
-                  "propertystreettype", "propertypostdirection",
-                  "propertyunitname", "propertycity", "propertyzipcode",
-                  "section", "township", "range", "status", "pool"),
-
-      col_types=c("text", "text", "text", "text",
+    cnames <- c("acct", "parcel", "parcelid", "accttype",
+            "propertytype", "impconditiontype", "impquality",
+            "implegalclass", "primarybltasdescription", "yearbuilt",
+            "physicalage", "adjustedyearbuilt", "effectiveage",
+            "totalimpsf", "residentialsf", "commercialsf", "condoimpsf",
+            "landlegalclass", "landnetacrecount", "taxareacode", "fcv",
+            "impvalue", "landvalue", "receptionno", "saledate", "saleprice",
+            "ownername1", "ownername2", "co", "mailingaddress", "ownercity",
+            "ownerstatecode", "ownerzipcode", "ownerprovince",
+            "ownerpostalcode", "ownercountry", "propertystreetno",
+            "propertypredirection", "propertystreetname",
+            "propertystreettype", "propertypostdirection",
+            "propertyunitname", "propertycity", "propertyzipcode",
+            "section", "township", "range", "status", "pool")
+    
+    cclasses <- c("text", "text", "text", "text",
                   "text","text","text",
                   "text","text","numeric",
                   "numeric","numeric","numeric",
@@ -151,10 +149,13 @@ read.pinal.data <- read_excel("data/countyData/Town of Queen Creek pools 2025 01
                   "text","text",
                   "text","text","text",
                   "text","text","text","text",
-                  "text"))
+                  "text")
+
+read.pinal.data <- read_excel("data/countyData/Town of Queen Creek pools 2025 01.23.25.xlsx", skip=1, col_names=cnames,
+                    col_types=cclasses)
     
- test <- read_excel("data/countyData/Town of Queen Creek pools 2025 01.23.25.xlsx", header=TRUE,
-                     col.names=cnames, colClasses=cclasses);
+test <- read_excel("data/countyData/Town of Queen Creek pools 2025 01.23.25.xlsx", skip=1,
+                     col_names=cnames,col_types=cclasses);
 
     test$county <- rep("pinal", length(test$parcel));
 
