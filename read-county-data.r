@@ -1,6 +1,7 @@
 library(anytime)
 library(tidyverse)
 library(lubridate)
+library(readxl)
 
 ## From varhandle package
 ## Function Description:
@@ -117,40 +118,42 @@ check.numeric <- function(v = NULL, na.rm = FALSE, only.integer = FALSE,
     }
 }
 
-read.pinal.data <- function(fileName) {
+##updated 123-154 on 2-24 to read Pinal data in Excel, unsure about row156 test
 
-    cnames <- c("acct", "parcel", "parcelid", "accttype",
-                "propertytype", "impconditiontype", "impquality",
-                "implegalclass", "primarybltasdescription", "yearbuilt",
-                "physicalage", "adjustedyearbuilt", "effectiveage",
-                "totalimpsf", "residentialsf", "commercialsf", "condoimpsf",
-                "landlegalclass", "landnetacrecount", "taxareacode", "fcv",
-                "impvalue", "landvalue", "receptionno", "saledate", "saleprice",
-                "ownername1", "ownername2", "co", "mailingaddress", "ownercity",
-                "ownerstatecode", "ownerzipcode", "ownerprovince",
-                "ownerpostalcode", "ownercountry", "propertystreetno",
-                "propertypredirection", "propertystreetname",
-                "propertystreettype", "propertypostdirection",
-                "propertyunitname", "propertycity", "propertyzipcode",
-                "section", "township", "range", "status", "pool");
+read.pinal.data <- read_excel("data/countyData/Town of Queen Creek pools 2025 01.23.25.xlsx", skip=1,
 
-    cclasses <- c("character",    "character",    "character",    "character",
-                  "character","character","character",
-                  "character","character","numeric",
+      col_names=c("acct", "parcel", "parcelid", "accttype",
+                  "propertytype", "impconditiontype", "impquality",
+                  "implegalclass", "primarybltasdescription", "yearbuilt",
+                  "physicalage", "adjustedyearbuilt", "effectiveage",
+                  "totalimpsf", "residentialsf", "commercialsf", "condoimpsf",
+                  "landlegalclass", "landnetacrecount", "taxareacode", "fcv",
+                  "impvalue", "landvalue", "receptionno", "saledate", "saleprice",
+                  "ownername1", "ownername2", "co", "mailingaddress", "ownercity",
+                  "ownerstatecode", "ownerzipcode", "ownerprovince",
+                  "ownerpostalcode", "ownercountry", "propertystreetno",
+                  "propertypredirection", "propertystreetname",
+                  "propertystreettype", "propertypostdirection",
+                  "propertyunitname", "propertycity", "propertyzipcode",
+                  "section", "township", "range", "status", "pool"),
+
+      col_types=c("text", "text", "text", "text",
+                  "text","text","text",
+                  "text","text","numeric",
                   "numeric","numeric","numeric",
                   "numeric","numeric","numeric","numeric",
-                  "character","numeric","character","numeric",
-                  "numeric","numeric","character","character","numeric",
-                  "character","character","character","character","character",
-                  "character","character","character",
-                  "character","character","character",
-                  "character","character",
-                  "character","character",
-                  "character","character","character",
-                  "character","character","character","character",
-                  "character");
-
-    test <- read.csv(fileName, sep=",", header=TRUE,
+                  "text","numeric","text","numeric",
+                  "numeric","numeric","text","text","numeric",
+                  "text","text","text","text","text",
+                  "text","text","text",
+                  "text","text","text",
+                  "text","text",
+                  "text","text",
+                  "text","text","text",
+                  "text","text","text","text",
+                  "text"))
+    
+ test <- read_excel("data/countyData/Town of Queen Creek pools 2025 01.23.25.xlsx", header=TRUE,
                      col.names=cnames, colClasses=cclasses);
 
     test$county <- rep("pinal", length(test$parcel));
