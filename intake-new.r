@@ -1,4 +1,4 @@
-# November 21 Updates. Fixed billTable date. Reformat to sentence case.
+# Updated with 2024 Imports
 library(lubridate)
 library(tidyverse)
 
@@ -20,8 +20,8 @@ readingTable19 <- read.csv("data/2019 BIF016 report.csv",
                                        "useOverrideReason", "billedConsumption", "isbilled")) %>%
   as_tibble() %>%
   separate(readingDate, sep=" ", into=c("readingDate","time","M"),
-           fill="right") %>%
-  select(-time,-M) %>%
+           fill="right") %>%8
+select(-time,-M) %>%
   separate(previousReadingDate, sep=" ",
            into=c("previousReadingDate","time","M"), fill="right") %>%
   select(-time,-M) %>%
@@ -143,7 +143,7 @@ readingTable23 <- read.csv("data/2023 BIF016 report.csv",
          previousReadingMonth=month(previousReadingDate)) %>%
   filter(canceled=="No");
 
-readingTable24 <- read.csv("data/2024 Jan to Sep BIF016 report.csv",
+readingTable24 <- read.csv("data/2024 BIF016 Report.csv",
                            col.names=c("billNumber", "account", "service",
                                        "meter","readType","currentReading",
                                        "readStatus", "billTyple", "cycle",
@@ -178,17 +178,12 @@ readingTable <- rbind(readingTable19,
                       readingTable22,
                       readingTable23,
                       readingTable24) %>%
-    ## This next step is because the reading data in the raw data is in the
-    ## form "53,200,00" instead of just being "53200", so this field is read
-    ## as a character string, not a number.
-    mutate(previousReading=as.numeric(gsub(".00$","",
-                                           gsub(",","",previousReading))),
-           currentReading=as.numeric(gsub(".00$","",
-                                          gsub(",","",currentReading))),
-           consumption=as.numeric(gsub(".00$","",
-                                       gsub(",","",consumption))))
-
-cat("done with readingtable\n")
+  ## This next step is because the reading data in the raw data is in the
+  ## form "53,200,00" instead of just being "53200", so this field is read
+  ## as a character string, not a number.
+  ## Paul changed export format, this mutate no longer needed
+  
+  cat("done with readingtable\n")
 
 addressTable <- read.csv("data/Updated BIF002 Report.csv",
                          col.names=c("streetNum","streetName","unit",
@@ -300,7 +295,7 @@ billTable23 <- read.csv("data/2023 BIF951 Report.csv",
   mutate(billDate=mdy(billDate),
          billMonth=month(billDate));
 
-billTable24 <- read.csv("data/2024 Jan to Sep BIF951 report.csv",
+billTable24 <- read.csv("data/2024 BIF951 Report.csv",
                         col.names=c("billNumber","billDate","accountType",
                                     "needsPayment","batchID","bif951pk",
                                     "billPrint","billGroup","billStat","billType",
@@ -323,3 +318,4 @@ billTable <- rbind(billTable19,
                    billTable24)
 
 cat("done with billTable\n");
+
