@@ -18,18 +18,18 @@ readingTable19 <- read.csv("data/2019 BIF016 report.csv",
                                        "serviceMultiplier2", "consumptionDiscount", "discountCode",
                                        "allocation", "factor", "overrideconsumption", "useOverride",
                                        "useOverrideReason", "billedConsumption", "isbilled")) %>%
-  as_tibble() %>%
-  separate(readingDate, sep=" ", into=c("readingDate","time","M"),
-           fill="right") %>%8
-select(-time,-M) %>%
-  separate(previousReadingDate, sep=" ",
-           into=c("previousReadingDate","time","M"), fill="right") %>%
-  select(-time,-M) %>%
-  mutate(readingDate=mdy(readingDate),
-         previousReadingDate=mdy(previousReadingDate),
-         readingMonth=month(readingDate),
-         previousReadingMonth=month(previousReadingDate)) %>%
-  filter(canceled=="No");
+    as_tibble() %>%
+    separate(readingDate, sep=" ", into=c("readingDate","time","M"),
+             fill="right") %>%
+    select(-time,-M) %>%
+    separate(previousReadingDate, sep=" ",
+             into=c("previousReadingDate","time","M"), fill="right") %>%
+    select(-time,-M) %>%
+    mutate(readingDate=mdy(readingDate),
+           previousReadingDate=mdy(previousReadingDate),
+           readingMonth=month(readingDate),
+           previousReadingMonth=month(previousReadingDate)) %>%
+    filter(canceled=="No");
 
 readingTable20 <- read.csv("data/2020 BIF016 report.csv",
                            col.names=c("billNumber", "account", "service",
@@ -177,7 +177,7 @@ readingTable <- rbind(readingTable19,
                       readingTable21,
                       readingTable22,
                       readingTable23,
-                      readingTable24) %>%
+                      readingTable24)
   ## This next step is because the reading data in the raw data is in the
   ## form "53,200,00" instead of just being "53200", so this field is read
   ## as a character string, not a number.
