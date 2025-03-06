@@ -178,10 +178,6 @@ readingTable <- rbind(readingTable19,
                       readingTable22,
                       readingTable23,
                       readingTable24)
-  ## This next step is because the reading data in the raw data is in the
-  ## form "53,200,00" instead of just being "53200", so this field is read
-  ## as a character string, not a number.
-  ## Paul changed export format, this mutate no longer needed
   
   cat("done with readingtable\n")
 
