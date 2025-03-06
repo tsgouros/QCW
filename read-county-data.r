@@ -186,12 +186,18 @@ read.pinal.data <- function(fileName) {
                   area=test$landnetacrecount,
                   address=gsub("^\\s+|\\s+$", "",
                                gsub("  ", " ",
-                                    paste(test$propertystreetno,
-                                          test$propertypredirection,
-                                          test$propertystreetname,
-                                          test$propertystreettype,
-                                          test$propertypostdirection,
-                                          test$propertyunitname,
+                                    paste(ifelse(is.na(test$propertystreetno),"",
+                                                 test$propertystreetno),
+                                          ifelse(is.na(test$propertypredirection),"",
+                                                 test$propertypredirection),
+                                          ifelse(is.na(test$propertystreetname),"",
+                                                 test$propertystreetname),
+                                          ifelse(is.na(test$propertystreettype),"",
+                                                 test$propertystreettype),
+                                          ifelse(is.na(test$propertypostdirection),"",
+                                                 test$propertypostdirection),
+                                          ifelse(is.na(test$propertyunitname),"",
+                                                 test$propertyunitname),
                                           sep=" "))),
                   section=factor(sapply(test$section,
                                         function(x) { if (nchar(x)==1)
@@ -211,6 +217,8 @@ read.pinal.data <- function(fileName) {
 }
 
 pinal <- read.pinal.data("data/countyData/pinal/Town of Queen Creek pools 2025 01.23.25.xlsx")
+
+cat("Finished reading Pinal County data.\n");
 
 ## Given a list of parcel numbers, returns something that looks like
 ## the pinal data, but only for the given parcels.
@@ -261,10 +269,10 @@ read.maricopa.data <- function(desiredparcels) {
         return(class[ which(frac == max(frac)) ]);
     }
 
-    for (filename in c("data/maricopa/QUEE_42061CT_01.dat",
-                       "data/maricopa/MESA_42061CT_01.dat",
-                       "data/maricopa/MESA_42061CT_02.dat",
-                       "data/maricopa/CNTY_42061CT_01.dat")) {
+    for (filename in c("data/countyData/maricopa/QUEE_42061CT_01.dat",
+                       "data/countyData/maricopa/MESA_42061CT_01.dat",
+                       "data/countyData/maricopa/MESA_42061CT_02.dat",
+                       "data/countyData/maricopa/CNTY_42061CT_01.dat")) {
         ## Read the file as line images.
         src <- read.delim(filename, head=F, sep="|", stringsAsFactors=FALSE)
 
@@ -350,9 +358,9 @@ read.maricopa.data <- function(desiredparcels) {
     yearbuilts <- c();
     poolarea <- c();
     
-    for (filename in c("data/maricopa/QUEE_42032ct.dat",
-                       "data/maricopa/MESA_42032ct.dat",
-                       "data/maricopa/CNTY_42032ct.dat")) {
+    for (filename in c("data/countyData/maricopa/QUEE_42032ct.dat",
+                       "data/countyData/maricopa/MESA_42032ct.dat",
+                       "data/countyData/maricopa/CNTY_42032ct.dat")) {
 
         src <- read.delim(filename, head=F, sep="|", stringsAsFactors=FALSE);
 
@@ -376,11 +384,17 @@ read.maricopa.data <- function(desiredparcels) {
     return(out);
 }
 
-mari <- read.maricopa.data(unique(big$parcel));
+mari <- read.maricopa.data(unique(addressTable$parcel));
 
+cat("Finished reading Maricopa County data.\n");
+
+## Show that the two sets of data have been successfully conformed
+## to one another. These colname lists should be the same.
 print(colnames(pinal));
 print(colnames(mari));
 
+## And since they are they same, they can be combined into one big
+## data table.
 prop <- rbind(pinal, mari);
 
 
