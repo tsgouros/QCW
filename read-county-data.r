@@ -119,6 +119,7 @@ check.numeric <- function(v = NULL, na.rm = FALSE, only.integer = FALSE,
 }
 
 ##updated 123-154 on 2-24 to read Pinal data in Excel, set names before running read_excel
+read.pinal.data <- function(fileName) {
 
     cnames <- c("acct", "parcel", "parcelid", "accttype",
             "propertytype", "impconditiontype", "impquality",
@@ -151,11 +152,8 @@ check.numeric <- function(v = NULL, na.rm = FALSE, only.integer = FALSE,
                   "text","text","text","text",
                   "text")
 
-read.pinal.data <- read_excel("data/countyData/Town of Queen Creek pools 2025 01.23.25.xlsx", skip=1, col_names=cnames,
-                    col_types=cclasses)
-    
-test <- read_excel("data/countyData/Town of Queen Creek pools 2025 01.23.25.xlsx", skip=1,
-                     col_names=cnames,col_types=cclasses);
+    test <- read_excel(fileName, skip=1, col_names=cnames, col_types=cclasses) %>%
+        filter(!is.na(acct));
 
     test$county <- rep("pinal", length(test$parcel));
 
@@ -174,7 +172,7 @@ test <- read_excel("data/countyData/Town of Queen Creek pools 2025 01.23.25.xlsx
 
     ## Maricopa has pool area data, so add a dummy variable to match it.
     test$poolarea <- rep(NA, length(test$parcel));
-    
+
     return(tibble(parcel=test$parcel,
                   type=test$propertytype,
                   ##condition=test$impconditiontype,
@@ -212,12 +210,7 @@ test <- read_excel("data/countyData/Town of Queen Creek pools 2025 01.23.25.xlsx
                   ));
 }
 
-pinal <- read.pinal.data("data/pinal/Account-Inventory-with-Land-Values-and-Pools-from-Imported-2020-List-Queen-Creek-Water-Board-5-24-2022.csv");
-pinal.new <- read.pinal.data("data/pinal/pinal-new-parcel-data.csv");
-
-pinal <- rbind(pinal, pinal.new);
-rm(pinal.new);
-
+pinal <- read.pinal.data("data/countyData/pinal/Town of Queen Creek pools 2025 01.23.25.xlsx")
 
 ## Given a list of parcel numbers, returns something that looks like
 ## the pinal data, but only for the given parcels.
