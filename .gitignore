@@ -5,6 +5,7 @@
 ## I don't think we want to commit data files to git.
 *.csv
 *.xlsx
+*.dat
 
 # Session Data files
 .RData
