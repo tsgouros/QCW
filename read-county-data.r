@@ -119,7 +119,12 @@ check.numeric <- function(v = NULL, na.rm = FALSE, only.integer = FALSE,
 }
 
 ##updated 123-154 on 2-24 to read Pinal data in Excel, set names before running read_excel
-read.pinal.data <- function(fileName) {
+#
+
+## The returnMatches argument controls whether the return contains the
+## parcels in desiredParcels that were found in the county data, or a
+## list of the parcels that were *not* found there.
+read.pinal.data <- function(fileName, desiredParcels, returnMatches=TRUE) {
 
     cnames <- c("acct", "parcel", "parcelid", "accttype",
             "propertytype", "impconditiontype", "impquality",
@@ -173,7 +178,7 @@ read.pinal.data <- function(fileName) {
     ## Maricopa has pool area data, so add a dummy variable to match it.
     test$poolarea <- rep(NA, length(test$parcel));
 
-    return(tibble(parcel=test$parcel,
+    out <- tibble(parcel=test$parcel,
                   type=test$propertytype,
                   ##condition=test$impconditiontype,
                   impvalue=test$impvalue,
@@ -213,16 +218,33 @@ read.pinal.data <- function(fileName) {
                   poolarea=test$poolarea,
                   pool=test$pool,
                   yearbuilt=test$yearbuilt
-                  ));
+                  );
+
+    ## Figure out whether to return the matches or the mismatches.
+    if (returnMatches) {
+        out <- out %>% filter(parcel %in% desiredParcels);
+        cat("Found ", dim(out)[1], " out of ", length(desiredParcels), "requested.\n")
+        return(out);
+    } else {
+        return(tibble(requestedParcels=desiredParcels[!desiredParcels %in% out$parcel]));
+    }   
 }
 
-pinal <- read.pinal.data("data/countyData/pinal/Town of Queen Creek pools 2025 01.23.25.xlsx")
+pinal <- read.pinal.data("data/countyData/pinal/Town of Queen Creek pools 2025 01.23.25.xlsx",
+                         unique((addressTable %>% filter(taxProfile==4|taxProfile==5))$parcel),
+                         returnMatches=TRUE)
 
 cat("Finished reading Pinal County data.\n");
 
 ## Given a list of parcel numbers, returns something that looks like
-## the pinal data, but only for the given parcels.
-read.maricopa.data <- function(desiredparcels) {
+## the pinal data for the given parcels. If returnMatches is set to
+## TRUE, the function will return a list of the parcels that were
+## found in the data files (this is the default). If returnMatches is
+## FALSE, the function will return the parcels for which there was no
+## county data.  Note also that the data files should really be an
+## input here, but they are complicated, so the file names are
+## hard-coded in.
+read.maricopa.data <- function(dataDir, desiredParcels, returnMatches=TRUE) {
 
     # returns string w/o leading or trailing whitespace
     trim <- function(str) gsub("^\\s+|\\s+$", "", str);
@@ -269,10 +291,10 @@ read.maricopa.data <- function(desiredparcels) {
         return(class[ which(frac == max(frac)) ]);
     }
 
-    for (filename in c("data/countyData/maricopa/QUEE_42061CT_01.dat",
-                       "data/countyData/maricopa/MESA_42061CT_01.dat",
-                       "data/countyData/maricopa/MESA_42061CT_02.dat",
-                       "data/countyData/maricopa/CNTY_42061CT_01.dat")) {
+    for (filename in c(paste0(dataDir, "/QUEE_42061CT_01.dat"),
+                       paste0(dataDir, "/MESA_42061CT_01.dat"),
+                       paste0(dataDir, "/MESA_42061CT_02.dat"),
+                       paste0(dataDir, "/CNTY_42061CT_01.dat")) ){
         ## Read the file as line images.
         src <- read.delim(filename, head=F, sep="|", stringsAsFactors=FALSE)
 
@@ -323,8 +345,8 @@ read.maricopa.data <- function(desiredparcels) {
         }
     }
 
-    compress <- parcels %in% desiredparcels;
-    cat("From ", filename, ", keeping ", sum(compress), " out of ",
+    compress <- parcels %in% desiredParcels;
+    cat("From ", filename, ", \nkeeping ", sum(compress), " out of ",
         length(compress), " parcels.\n", sep="");
     county <- rep("maricopa", sum(compress));
 
@@ -358,10 +380,10 @@ read.maricopa.data <- function(desiredparcels) {
     yearbuilts <- c();
     poolarea <- c();
     
-    for (filename in c("data/countyData/maricopa/QUEE_42032ct.dat",
-                       "data/countyData/maricopa/MESA_42032ct.dat",
-                       "data/countyData/maricopa/CNTY_42032ct.dat")) {
-
+    for (filename in c(paste0(dataDir, "/QUEE_42032ct.dat"),
+                       paste0(dataDir, "/MESA_42032ct.dat"),
+                       paste0(dataDir, "/CNTY_42032ct.dat")) ) {
+        
         src <- read.delim(filename, head=F, sep="|", stringsAsFactors=FALSE);
 
         for (record in src) {
@@ -381,17 +403,27 @@ read.maricopa.data <- function(desiredparcels) {
                          yearbuilt=yearbuilts),
                   by="parcel")
 
-    return(out);
+
+    ## Figure out whether to return the matches or the mismatches.
+    if (returnMatches) {
+        out <- out %>% filter(parcel %in% desiredParcels);
+        cat("Found ", dim(out)[1], " out of ", length(desiredParcels), "requested.\n")
+        return(out);
+    } else {
+        return(tibble(requestedParcels=desiredParcels[!desiredParcels %in% out$parcel]));
+    }   
 }
 
-mari <- read.maricopa.data(unique(addressTable$parcel));
+mari <- read.maricopa.data("data/countyData/maricopa",
+                           unique((addressTable %>% filter(taxProfile==1|taxProfile==3))$parcel),
+                           returnMatches=TRUE)
 
 cat("Finished reading Maricopa County data.\n");
 
 ## Show that the two sets of data have been successfully conformed
 ## to one another. These colname lists should be the same.
-print(colnames(pinal));
-print(colnames(mari));
+##print(colnames(pinal));
+##print(colnames(mari));
 
 ## And since they are they same, they can be combined into one big
 ## data table.
