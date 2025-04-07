@@ -511,11 +511,26 @@ maricopa <- tibble(parcel=merged$parcel,
                    impvalue=merged$impValue,
                    landvalue=merged$landValue,
                    fcv=merged$fcv,
-                   totalsf=merged$sqFootage,
+                   totalsf=ifelse(is.na(merged$sqFootage),
+                                  0, as.numeric(merged$sqFootage)),
                    impclass=merged$improvementClass1st,
                    landclass=merged$landClass1st,
-                   area=merged$sqFootage,
-                   address=merged$streetName,
+                   area=merged$sqFootage/43560,
+                   address=gsub("^\\s+|\\s+$", "",
+                                gsub("  ", " ",
+                                     paste(ifelse(is.na(merged$streetNum.x),"",
+                                                  merged$streetNum.x),
+                                           ifelse(is.na(merged$streetDir1),"",
+                                                  merged$streetDir1),
+                                           ifelse(is.na(merged$streetName),"",
+                                                  merged$streetName),
+                                           ifelse(is.na(merged$streetType),"",
+                                                  merged$streetType),
+                                           ifelse(is.na(merged$streetPostDir),"",
+                                                  merged$streetPostDir),
+                                           ifelse(is.na(merged$suite),"",
+                                                  merged$suite),
+                                           sep=" "))),
                    section=merged$section,
                    township=merged$town,
                    range=merged$range,
@@ -524,5 +539,11 @@ maricopa <- tibble(parcel=merged$parcel,
                    county="maricopa",
                    poolarea=merged$poolArea,
                    pool=ifelse(is.na(merged$poolArea),FALSE,TRUE),
-                   yearbuilt=merged$constructionYear
-);
+                   yearbuilt=merged$constructionYear);
+
+filtered_maricopa <- filter(maricopa, parcel %in% addressTable$parcel)
+
+
+
+
+
