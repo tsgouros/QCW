@@ -230,7 +230,7 @@ read.pinal.data <- function(fileName, desiredParcels, returnMatches=TRUE) {
     }   
 }
 
-pinal <- read.pinal.data("data/countyData/pinal/Town of Queen Creek pools 2025 01.23.25.xlsx",
+pinal <- read.pinal.data("data/countyData/pinal/Town of Queen Creek pools 2025 03.06.25.xlsx",
                          unique((addressTable %>% filter(taxProfile==4|taxProfile==5))$parcel),
                          returnMatches=TRUE)
 
@@ -430,7 +430,8 @@ cat("Finished reading Maricopa County data.\n");
 prop <- rbind(pinal, mari);
 
 
-##import r116 residential files from Maricopa County Assessor. Complete files are in the OWN version ##
+##import r116 residential files from Maricopa County Assessor. Complete files are in the OWN version 
+##these three data files are not in the same format so the select function after each read makes the data frame consistent
 
 residentialQC <- read.delim("data/countyData/maricopa/R116_QU_OWN_2025.txt", header= FALSE, sep ="|", dec = ".",
                             col.names=c("countyID", "parcel", "proportionComplete", "class", "storyCount", "airConType", 
@@ -439,7 +440,9 @@ residentialQC <- read.delim("data/countyData/maricopa/R116_QU_OWN_2025.txt", hea
                                         "basement", "parkCode", "patios", "poolArea", "salePrice", "saleDate",
                                         "addedArea", "detachArea", "puc", "ownersName", "ownersAddr1", "ownersAddr2",
                                         "ownerCity", "ownersState", "ownersZipCode", "ownerCountry", "streetNum",
-                                        "streetDir1", "streetName1", "streetType1", "streetPostDir1", "suite1", "city1", "zip"));
+                                        "streetDir1", "streetName1", "streetType1", "streetPostDir1", "suite1", "city1", "zip")) %>%
+                              select(-countyID) %>%
+                              as_tibble();
 
 
 residentialMesa <- read.delim("data/countyData/maricopa/R116_ME_OWN_2025.txt", header= FALSE, sep ="|", dec = ".",
@@ -449,8 +452,10 @@ residentialMesa <- read.delim("data/countyData/maricopa/R116_ME_OWN_2025.txt", h
                                           "basement", "parkCode", "patios", "poolArea", "salePrice", "saleDate",
                                           "addedArea", "detachArea", "puc", "ownersName", "ownersAddr1", "ownersAddr2",
                                           "ownerCity", "ownersState", "ownersZipCode", "ownerCountry", "streetNum",
-                                          "streetDir1", "streetName1", "streetType1", "streetPostDir1", "suite1", "city1", "zip"));
-
+                                          "streetDir1", "streetName1", "streetType1", "streetPostDir1", "suite1", "city1", "zip")) %>%
+                              select(-countyID) %>%
+                              as_tibble();
+                              
 
 residentialCounty <- read.delim("data/countyData/maricopa/R116_OWN_2025.txt", header= FALSE, sep ="|", dec = ".",
                                 col.names=c("parcel", "proportionComplete", "class", "storyCount", "airConType", 
@@ -460,12 +465,10 @@ residentialCounty <- read.delim("data/countyData/maricopa/R116_OWN_2025.txt", he
                                             "addedArea", "detachArea", "puc", "ownersName", "ownersAddr1", "ownersAddr2",
                                             "ownerCity", "ownersState", "ownersZipCode", "ownerCountry", "streetNum",
                                             "streetDir1", "streetName1", "streetType1", "streetPostDir1", "suite1", "city1", "zip",
-                                            "na1", "na2", "na3", "na4"));
+                                            "na1", "na2", "na3", "na4")) %>%
+                              select(-na1,-na2,-na3,-na4) %>%
+                              as_tibble();
 
-cleanDF <- c("countyID", "na1", "na2", "na3", "na4")
-residentialMesa <- residentialMesa[, ! names(residentialMesa) %in% cleanDF, drop=F]
-residentialQC <- residentialQC[, ! names(residentialQC) %in% cleanDF, drop=F]
-residentialCounty <- residentialCounty[, ! names(residentialCounty) %in% cleanDF, drop=F]
 
 residential <- rbind(residentialQC,
                      residentialMesa,
