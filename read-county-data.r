@@ -456,8 +456,7 @@ residentialMesa <- read.delim("data/countyData/maricopa/R116_ME_OWN_2025.txt", h
                               select(-countyID) %>%
                               as_tibble();
                               
-
-residentialCounty <- read.delim("data/countyData/maricopa/R116_OWN_2025.txt", header= FALSE, sep ="|", dec = ".",
+residentialCounty <- read.delim("data/countyData/maricopa/R116_OWN_2025.txt", header= FALSE, sep ="|", dec = ".", quote="~",
                                 col.names=c("parcel", "proportionComplete", "class", "storyCount", "airConType", 
                                             "heatingType", "bathroomFixtures", "extWallMaterial", "roofMaterial", "roofStyle",
                                             "constructionYear", "livingSqft", "1stFloor", "2ndFloor", "3rdFloor",
@@ -469,7 +468,6 @@ residentialCounty <- read.delim("data/countyData/maricopa/R116_OWN_2025.txt", he
                               select(-na1,-na2,-na3,-na4) %>%
                               as_tibble();
 
-
 residential <- rbind(residentialQC,
                      residentialMesa,
                      residentialCounty)
@@ -477,7 +475,7 @@ residential <- rbind(residentialQC,
 ##import r117 commercial data ##
 
 
-commercial <- read.delim("data/countyData/maricopa/R117_2025.txt", header= FALSE, sep ="|", quote = "\"", dec = ".",
+commercial <- read.delim("data/countyData/maricopa/R117_2025.txt", header= FALSE, sep ="|", quote = "~", dec = ".",
                          col.names=c("countyID", "parcel", "improvementID", "occNum", "occRank", "structClass",
                                      "occDescr", "improvementFcv", "stories", "wallHeight", "gfPermeter",
                                      "gfArea", "floorArea", "constructionYear", "pctComplete", "pctObsolete",
@@ -485,24 +483,41 @@ commercial <- read.delim("data/countyData/maricopa/R117_2025.txt", header= FALSE
 
 ## 1770 is the premium secured master data to use. QC area parcels are in tax roll 6 in the 2025 file ##
 
-
-r1770 <- read.delim("data/countyData/maricopa/R1170_SecMaster_2025_TAX_ROLL_6.txt", header= FALSE, sep ="|", dec = ".",
-                    col.names=c("parcel", "propertyStatus", "propertyUseCode", "taxAreaCode", "orgExemptionCode",
-                                "orgExemptIndicator", "section", "town", "range", "sectionQuarter", "lot", "block",
-                                "tract", "streetNum", "streetDir","streetName", "streetType", "streetPostDir", "suite",
-                                "city", "zip", "ownersName", "ownersDeed", "ownersDeedDate", "feesName", "feesDeed",
-                                "feesDeedDate","ownersAddr1stLine","ownersAddr2ndLine","ownersCity","ownersState",
-                                "ownersZipCode", "ownerCountry", "lpvPercent", "lpvAmount", "lpvAssessedValue", "fcv",
-                                "landAssessmentPerc", "landValue", "imprAssessmentPerc", "impValue", "widvetIndicator",
-                                "widvetlpvexAssessedValue", "widvetfcvxAssessedValue", "sqFootage", "valSource",
-                                "overrideCode", "landClass1st", "landRatio1st", "land2nd", "landRatio2nd", "land3rd", 
-                                "landRatio3rd", "land4th","landRatio4th", "improvementClass1st","improvedmentRatio1st",
-                                "improvement2nd", "improvementRatio2nd", "improvement3rd", "improvementRatio3rd",
-                                "improvement4th", "improvementRatio4th", "landAreaType", "neighborhoodCode",
-                                "marketAreaCode", "mcr","subdivision", "mailingDate", "economicUnit", "numberofUnits", 
-                                "districtCode1", "districtCodeValue1", "districtCode2", "districtCodeValue2", 
-                                "districtCode3", "disctrictCodeValue3", "districtCode4", "districtCodeValue4", 
-                                "districtCode5", "districtCodeValue5", "districtCode6", "districtCodeValue6", "lglDesc", "na"));
+r1770 <- read.delim("data/countyData/maricopa/R1170_SecMaster_2025_TAX_ROLL_6.txt",
+                    header= FALSE, sep ="|", dec = ".", quote="~",
+                    col.names=c("parcel", "propertyStatus", "propertyUseCode",
+                                "taxAreaCode", "orgExemptionCode",
+                                "orgExemptIndicator", "section", "town",
+                                "range", "sectionQuarter", "lot", "block",
+                                "tract", "streetNum", "streetDir","streetName",
+                                "streetType", "streetPostDir", "suite",
+                                "city", "zip", "ownersName", "ownersDeed",
+                                "ownersDeedDate", "feesName", "feesDeed",
+                                "feesDeedDate","ownersAddr1stLine",
+                                "ownersAddr2ndLine","ownersCity","ownersState",
+                                "ownersZipCode", "ownerCountry", "lpvPercent",
+                                "lpvAmount", "lpvAssessedValue", "fcv",
+                                "landAssessmentPerc", "landValue",
+                                "imprAssessmentPerc", "impValue",
+                                "widvetIndicator", "widvetlpvexAssessedValue",
+                                "widvetfcvxAssessedValue", "sqFootage",
+                                "valSource", "overrideCode", "landClass1st",
+                                "landRatio1st", "land2nd", "landRatio2nd",
+                                "land3rd", "landRatio3rd", "land4th",
+                                "landRatio4th", "improvementClass1st",
+                                "improvedmentRatio1st", "improvement2nd",
+                                "improvementRatio2nd", "improvement3rd",
+                                "improvementRatio3rd", "improvement4th",
+                                "improvementRatio4th", "landAreaType",
+                                "neighborhoodCode", "marketAreaCode", "mcr",
+                                "subdivision", "mailingDate", "economicUnit",
+                                "numberofUnits", "districtCode1",
+                                "districtCodeValue1", "districtCode2",
+                                "districtCodeValue2", "districtCode3",
+                                "disctrictCodeValue3", "districtCode4",
+                                "districtCodeValue4", "districtCode5",
+                                "districtCodeValue5", "districtCode6",
+                                "districtCodeValue6", "lglDesc", "na"));
 
 merged <- merge(r1770,residential, by = "parcel")
 
