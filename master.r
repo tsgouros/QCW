@@ -80,13 +80,13 @@ waterTable <- billTable %>%
                                   "School",
                            ifelse(service=="Rental Meters",
                                   "Construction",
-                           ifelse(accountType=="RE" | accountType=="MF",
+                           ifelse(accountType=="Residential/Single Family" | accountType=="Multi-Unit Family",
                                   "Residential",
-                           ifelse(accountType=="MU",
+                           ifelse(accountType=="Town of Queen Creek",
                                   "Government",
-                           ifelse(accountType=="CO",
+                           ifelse(accountType=="Commercial",
                                   "Commercial",
-                           ifelse(accountType=="TM",
+                           ifelse(accountType=="Temp Meter",
                                   "Construction",
                                   "Unknown")))))))))
 
