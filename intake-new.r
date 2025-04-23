@@ -177,7 +177,10 @@ readingTable <- rbind(readingTable19,
                       readingTable21,
                       readingTable22,
                       readingTable23,
-                      readingTable24)
+                      readingTable24) %>%
+              mutate(consumption=as.numeric(consumption),
+                     previousReading=as.numeric(previousReading),
+                     currentReading=as.numeric(currentReading))
   
   cat("done with readingtable\n")
 
