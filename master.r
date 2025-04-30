@@ -69,6 +69,9 @@ waterTable <- billTable %>%
     left_join(customerTable %>% group_by(customer) %>%
               dplyr::summarize(revenueClass=first(revenueClass)),
               by="customer") %>%
+    left_join(addressTable %>%
+                select(account, subdivision, latitude, longitude, taxProfile),
+                by="account") %>%
     mutate(waterUseSegment=ifelse(service=="Irrigation",
                                   "Irrigation",
                            ifelse(service=="Landscape",
