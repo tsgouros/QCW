@@ -95,59 +95,35 @@ system("date")
 ## resids <- c();
 ## for (timeShift in seq(-pi/2, pi/2, by=pi/24)) {
 
-## 6/29/23 Grab the table of conversions from old account numbers to
-## new.  Note that it also has a sewer flag.
-conv <- readxl::read_excel("data/Account\ Mapping\ CIS\ update\ v2.xlsx",
-                           sheet="Data",
-                           range=cell_limits(c(2,1),c(NA,14)),
-                           col_names=c("ccustomer","caccount","status","acctType",
-                                       "occType","taxProfile","acct","locID",
-                                       "irrigation","landscape","rentalMeters",
-                                       "sewer","trash","water"),
-                           col_types=c(rep("text",8),
-                                       rep("logical",6)));
-
-## Attach these values to the big data array
-big <- big %>% left_join(conv);
-
 
 ## Create a list of means and maxima for each account/parcel/rate
 ## combination.
-big.means <- big %>%
-##    filter(grepl("^J", subdiv)) %>%
-    group_by(acct, parcel, locID) %>%
-    dplyr::summarize(avg=mean(usage),
-                     mx=max(usage),
-                     avgchg=mean(charge),
-                     mxchg=max(charge),
-                     acctAge=first(acctAge),
-                     locClass=first(locClass),
-                     class=first(class),
-                     rate=first(rate),
-                     subdiv=first(subdiv),
-                     lat.orig=first(lat),
-                     lon.orig=first(lon),
-                     startMonth=convertDateToInteger(first(myear), first(mmnth)),
-                     endMonth=convertDateToInteger(last(myear), last(mmnth)),
-                     tmp=getComp(usage, mmnth, myear),
-                     januse=sum(ifelse(mmnth==1,usage,0)),
-                     jansum=sum(ifelse(mmnth==1,1,0)),
-                     winuse=sum(ifelse((mmnth==12)|(mmnth==1)|(mmnth==2),usage,0)),
-                     winsum=sum(ifelse((mmnth==12)|(mmnth==1)|(mmnth==2),1,0)),
-                     ccustomer=first(ccustomer),
-                     caccount=first(caccount),
-                     status=first(status),
-                     acctType=first(acctType),
-                     taxProfile=first(taxProfile),
-                     irrigation=first(irrigation),
-                     landscape=first(landscape),
-                     rentalMeters=first(rentalMeters),
-                     sewer=first(sewer),
-                     trash=first(trash),
-                     water=first(water),
-                     .groups="drop") %>%
-    unpack(tmp) %>%
-    mutate(cusID=paste0(acct, "-", parcel, "-", locID))
+## Updated 5-6-25 with waterTable fields
+
+water.means <- waterTable %>%
+  ##    filter(grepl("^J", subdiv)) %>%
+  group_by(account, parcel) %>%
+  dplyr::summarize(avg=mean(consumption),
+                   mx=max(consumption),
+                   avgchg=mean(currentTrans),
+                   mxchg=max(currentTrans),
+                   acctType=first(accountType),
+                   revClass=first(revenueClass),
+                   service=first(service),
+                   subdiv=first(subdivision),
+                   lat.orig=first(latitude),
+                   lon.orig=first(longitude),
+                   startMonth=convertDateToInteger(first(billYear), first(billMonth)),
+                   endMonth=convertDateToInteger(last(billYear), last(billMonth)),
+                   tmp=getComp(consumption, billMonth, billYear),
+                   januse=sum(ifelse(billMonth==1,consumption,0)),
+                   jansum=sum(ifelse(billMonth==1,1,0)),
+                   winuse=sum(ifelse((billMonth==12)|(billMonth==1)|(billMonth==2),consumption,0)),
+                   winsum=sum(ifelse((billMonth==12)|(billMonth==1)|(billMonth==2),1,0)),
+                   taxProfile=first(taxProfile),                    
+                   .groups="drop") %>%
+  unpack(tmp) %>%
+  mutate(cusID=paste0(account, "-", parcel))
 
 ## big.means <- big %>%
 ##     filter(grepl("^J", subdiv)) %>%
@@ -193,22 +169,22 @@ big.means <- big %>%
 
 ## Now take those model results and paste them back on the original
 ## data so we can calculate residuals to estimate errors.
-big.resid <- big %>%
-    mutate(cusID=paste0(acct, "-", parcel, "-", locID),
-           cdate=(convertDateToInteger(myear, mmnth) * (pi/6))) %>%
-    right_join(big.means %>%
+water.resid <- waterTable %>%
+    mutate(cusID=paste0(account, "-", parcel),
+           cdate=(convertDateToInteger(billYear, billMonth) * (pi/6))) %>%
+    right_join(water.means %>%
                select(cusID, avg, mx, amp, off, slp, win1, win2, win3),
                by="cusID") %>%
     mutate(predUsage = amp * (cos(cdate + timeShift) + 1) + off + (slp * cdate),
-           predResidual=(predUsage-usage)^2);
+           predResidual=(predUsage-consumption)^2);
     
-    big.means <- big.resid %>%
-    group_by(acct, parcel, rate) %>%
+    water.means <- water.resid %>%
+    group_by(account, parcel) %>%
     dplyr::summarize(cusID=first(cusID),
                      rmsUsage = mean(predResidual)^0.5,
                      .groups="drop") %>%
-    select(-acct, -parcel, -rate) %>%
-    right_join(big.means, by="cusID")
+    select(-account, -parcel) %>%
+    right_join(water.means, by="cusID")
 
 
 ## ## Make a report of the residuals.
