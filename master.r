@@ -33,7 +33,7 @@ cleanup <- FALSE;
 ## To establish consistency in creating the time base from year and
 ## month data.
 convertDateToInteger <- function(year, month) {
-    return((year - 2017) * 12 + (month - 6));
+    return((year - 2019) * 12 + (month - 6));
 }
 
 ## *** GATHER DATA
