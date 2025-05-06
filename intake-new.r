@@ -171,13 +171,41 @@ readingTable24 <- read.csv("data/2024 BIF016 Report.csv",
          previousReadingMonth=month(previousReadingDate)) %>%
   filter(canceled=="No");
 
+readingTable25 <- read.csv("data/2025 BIF016 Report.csv",
+                           col.names=c("billNumber", "account", "service",
+                                       "meter","readType","currentReading",
+                                       "readStatus", "billTyple", "cycle",
+                                       "book", "readingDate", "sequenceNumber",
+                                       "peakTime", "readingID", "processed", "supplier",
+                                       "customer", "previousReading", "notes", "consumption",
+                                       "multiplier1", "multiplier2", "units", "mv90Channel",
+                                       "lossFactor","serviceID","previousReadingDate",
+                                       "workerCode", "interval", "billingInterval", "serviceOrder",
+                                       "meterTroubleCode1", "meterTroubleCode2", "validated", "days",
+                                       "demandFactor", "canceled", "serviceMultiplier1",
+                                       "serviceMultiplier2", "consumptionDiscount", "discountCode",
+                                       "allocation", "factor", "overrideconsumption", "useOverride",
+                                       "useOverrideReason", "billedConsumption", "isbilled")) %>%
+  as_tibble() %>%
+  separate(readingDate, sep=" ", into=c("readingDate","time","M"),
+           fill="right") %>%
+  select(-time,-M) %>%
+  separate(previousReadingDate, sep=" ",
+           into=c("previousReadingDate","time","M"), fill="right") %>%
+  select(-time,-M) %>%
+  mutate(readingDate=mdy(readingDate),
+         previousReadingDate=mdy(previousReadingDate),
+         readingMonth=month(readingDate),
+         previousReadingMonth=month(previousReadingDate)) %>%
+  filter(canceled=="No");
 
 readingTable <- rbind(readingTable19,
                       readingTable20,
                       readingTable21,
                       readingTable22,
                       readingTable23,
-                      readingTable24) %>%
+                      readingTable24,
+                      readingTable25) %>%
               mutate(consumption=as.numeric(consumption),
                      previousReading=as.numeric(previousReading),
                      currentReading=as.numeric(currentReading))
@@ -309,12 +337,28 @@ billTable24 <- read.csv("data/2024 BIF951 Report.csv",
   mutate(billDate=mdy(billDate),
          billMonth=month(billDate));
 
+billTable25 <- read.csv("data/2025 BIF951 Report.csv",
+                        col.names=c("billNumber","billDate","accountType",
+                                    "needsPayment","batchID","bif951pk",
+                                    "billPrint","billGroup","billStat","billType",
+                                    "chgBill","cycle","book","cancel","account",
+                                    "customer","customerAcctID","dueDate",
+                                    "paymentProfile","processed","serAdd",
+                                    "balanceForward","previousBilling",
+                                    "sinceLastBill","currentTrans","cancelledBilling",
+                                    "amountDue","addressType","address1",
+                                    "address2","address3","address4","address5","address6")) %>%
+  as_tibble() %>%
+  mutate(billDate=mdy(billDate),
+         billMonth=month(billDate));
+
 billTable <- rbind(billTable19,
                    billTable20,
                    billTable21,
                    billTable22,
                    billTable23,
-                   billTable24)
+                   billTable24,
+                   billTable25)
 
 cat("done with billTable\n");
 
