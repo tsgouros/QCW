@@ -56,7 +56,8 @@ waterTable <- billTable %>%
                      ifelse(billDate>=ymd("2023-04-12")&
                             billDate<ymd("2023-05-09"),
                             4,
-                            billMonth))) %>% 
+                            billMonth))) %>%
+    mutate(billYear=year(billTable$billDate)) %>%
     right_join(readingTable %>%
               select(billNumber, service, meter, currentReading,
                      previousReading, consumption,
