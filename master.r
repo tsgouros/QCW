@@ -61,7 +61,7 @@ waterTable <- billTable %>%
               select(billNumber, service, meter, currentReading,
                      previousReading, consumption,
                      readingDate, readingMonth, readStatus,
-                     previousReadingDate, previousReadingMonth) %>%
+                     previousReadingDate, previousReadingMonth,readingYear) %>%
               ## there are records where the following is not true, seem mostly
               ## to be from 2/2023.
               filter(consumption == (currentReading - previousReading)),
