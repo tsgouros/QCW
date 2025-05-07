@@ -28,6 +28,7 @@ readingTable19 <- read.csv("data/2019 BIF016 report.csv",
     mutate(readingDate=mdy(readingDate),
            previousReadingDate=mdy(previousReadingDate),
            readingMonth=month(readingDate),
+           readingYear=year(readingDate),
            previousReadingMonth=month(previousReadingDate)) %>%
     filter(canceled=="No");
 
@@ -56,6 +57,7 @@ readingTable20 <- read.csv("data/2020 BIF016 report.csv",
   mutate(readingDate=mdy(readingDate),
          previousReadingDate=mdy(previousReadingDate),
          readingMonth=month(readingDate),
+         readingYear=year(readingDate),
          previousReadingMonth=month(previousReadingDate)) %>%
   filter(canceled=="No");
 
@@ -84,6 +86,7 @@ readingTable21 <- read.csv("data/2021 BIF016 report.csv",
   mutate(readingDate=mdy(readingDate),
          previousReadingDate=mdy(previousReadingDate),
          readingMonth=month(readingDate),
+         readingYear=year(readingDate),
          previousReadingMonth=month(previousReadingDate)) %>%
   filter(canceled=="No");
 
@@ -112,6 +115,7 @@ readingTable22 <- read.csv("data/2022 BIF016 report.csv",
   mutate(readingDate=mdy(readingDate),
          previousReadingDate=mdy(previousReadingDate),
          readingMonth=month(readingDate),
+         readingYear=year(readingDate),
          previousReadingMonth=month(previousReadingDate)) %>%
   filter(canceled=="No");
 
@@ -140,6 +144,7 @@ readingTable23 <- read.csv("data/2023 BIF016 report.csv",
   mutate(readingDate=mdy(readingDate),
          previousReadingDate=mdy(previousReadingDate),
          readingMonth=month(readingDate),
+         readingYear=year(readingDate),
          previousReadingMonth=month(previousReadingDate)) %>%
   filter(canceled=="No");
 
@@ -168,6 +173,7 @@ readingTable24 <- read.csv("data/2024 BIF016 Report.csv",
   mutate(readingDate=mdy(readingDate),
          previousReadingDate=mdy(previousReadingDate),
          readingMonth=month(readingDate),
+         readingYear=year(readingDate),
          previousReadingMonth=month(previousReadingDate)) %>%
   filter(canceled=="No");
 
@@ -196,6 +202,7 @@ readingTable25 <- read.csv("data/2025 BIF016 Report.csv",
   mutate(readingDate=mdy(readingDate),
          previousReadingDate=mdy(previousReadingDate),
          readingMonth=month(readingDate),
+         readingYear=year(readingDate),
          previousReadingMonth=month(previousReadingDate)) %>%
   filter(canceled=="No");
 
@@ -260,7 +267,8 @@ billTable19 <- read.csv("data/2019 BIF951 Report.csv",
                                     "address2","address3","address4","address5","address6")) %>%
   as_tibble() %>%
   mutate(billDate=mdy(billDate),
-         billMonth=month(billDate));
+         billMonth=month(billDate),
+         billYear=year(billDate));
 
 billTable20 <- read.csv("data/2020 BIF951 Report.csv",
                         col.names=c("billNumber","billDate","accountType",
@@ -275,7 +283,8 @@ billTable20 <- read.csv("data/2020 BIF951 Report.csv",
                                     "address2","address3","address4","address5","address6")) %>%
   as_tibble() %>%
   mutate(billDate=mdy(billDate),
-         billMonth=month(billDate));
+         billMonth=month(billDate),
+         billYear=year(billDate));
 
 billTable21 <- read.csv("data/2021 BIF951 Report.csv",
                         col.names=c("billNumber","billDate","accountType",
@@ -290,7 +299,8 @@ billTable21 <- read.csv("data/2021 BIF951 Report.csv",
                                     "address2","address3","address4","address5","address6")) %>%
   as_tibble() %>%
   mutate(billDate=mdy(billDate),
-         billMonth=month(billDate));
+         billMonth=month(billDate),
+         billYear=year(billDate));
 
 billTable22 <- read.csv("data/2022 BIF951 Report.csv",
                         col.names=c("billNumber","billDate","accountType",
@@ -305,7 +315,8 @@ billTable22 <- read.csv("data/2022 BIF951 Report.csv",
                                     "address2","address3","address4","address5","address6")) %>%
   as_tibble() %>%
   mutate(billDate=mdy(billDate),
-         billMonth=month(billDate));
+         billMonth=month(billDate),
+         billYear=year(billDate));
 
 billTable23 <- read.csv("data/2023 BIF951 Report.csv",
                         col.names=c("billNumber","billDate","accountType",
@@ -320,7 +331,8 @@ billTable23 <- read.csv("data/2023 BIF951 Report.csv",
                                     "address2","address3","address4","address5","address6")) %>%
   as_tibble() %>%
   mutate(billDate=mdy(billDate),
-         billMonth=month(billDate));
+         billMonth=month(billDate),
+         billYear=year(billDate));
 
 billTable24 <- read.csv("data/2024 BIF951 Report.csv",
                         col.names=c("billNumber","billDate","accountType",
@@ -335,7 +347,8 @@ billTable24 <- read.csv("data/2024 BIF951 Report.csv",
                                     "address2","address3","address4","address5","address6")) %>%
   as_tibble() %>%
   mutate(billDate=mdy(billDate),
-         billMonth=month(billDate));
+         billMonth=month(billDate),
+         billYear=year(billDate));
 
 billTable25 <- read.csv("data/2025 BIF951 Report.csv",
                         col.names=c("billNumber","billDate","accountType",
@@ -350,7 +363,8 @@ billTable25 <- read.csv("data/2025 BIF951 Report.csv",
                                     "address2","address3","address4","address5","address6")) %>%
   as_tibble() %>%
   mutate(billDate=mdy(billDate),
-         billMonth=month(billDate));
+         billMonth=month(billDate),
+         billYear=year(billDate));
 
 billTable <- rbind(billTable19,
                    billTable20,
