@@ -113,13 +113,13 @@ water.means <- waterTable %>%
                    subdiv=first(subdivision),
                    lat.orig=first(latitude),
                    lon.orig=first(longitude),
-                   startMonth=convertDateToInteger(first(billYear), first(billMonth)),
-                   endMonth=convertDateToInteger(last(billYear), last(billMonth)),
-                   tmp=getComp(consumption, billMonth, billYear),
-                   januse=sum(ifelse(billMonth==1,consumption,0)),
-                   jansum=sum(ifelse(billMonth==1,1,0)),
-                   winuse=sum(ifelse((billMonth==12)|(billMonth==1)|(billMonth==2),consumption,0)),
-                   winsum=sum(ifelse((billMonth==12)|(billMonth==1)|(billMonth==2),1,0)),
+                   startMonth=convertDateToInteger(first(readingYear), first(readingMonth)),
+                   endMonth=convertDateToInteger(last(readingYear), last(readingMonth)),
+                   tmp=getComp(consumption, readingMonth, readingYear),
+                   januse=sum(ifelse(readingMonth==1,consumption,0)),
+                   jansum=sum(ifelse(readingMonth==1,1,0)),
+                   winuse=sum(ifelse((readingMonth==12)|(readingMonth==1)|(readingMonth==2),consumption,0)),
+                   winsum=sum(ifelse((readingMonth==12)|(readingMonth==1)|(readingMonth==2),1,0)),
                    taxProfile=first(taxProfile),                    
                    .groups="drop") %>%
   unpack(tmp) %>%
@@ -171,7 +171,7 @@ water.means <- waterTable %>%
 ## data so we can calculate residuals to estimate errors.
 water.resid <- waterTable %>%
     mutate(cusID=paste0(account, "-", parcel),
-           cdate=(convertDateToInteger(billYear, billMonth) * (pi/6))) %>%
+           cdate=(convertDateToInteger(readingYear, readingMonth) * (pi/6))) %>%
     right_join(water.means %>%
                select(cusID, avg, mx, amp, off, slp, win1, win2, win3),
                by="cusID") %>%
