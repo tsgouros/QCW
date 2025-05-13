@@ -1,6 +1,6 @@
 ## This file just runs the regression machinery on the water billing data.
 
-timeShift <- -pi/12;
+timeShift <- pi/12;
 
 getComp <- function(usage, mmnth, myear) {
 
@@ -95,6 +95,8 @@ system("date")
 ## resids <- c();
 ## for (timeShift in seq(-pi/2, pi/2, by=pi/24)) {
 
+timeShifts <- c();
+resids <- c();
 
 ## Create a list of means and maxima for each account/parcel/rate
 ## combination.
@@ -153,6 +155,15 @@ water.means <- waterTable %>%
 ##                         win1=c(),
 ##                         win2=c(),
 ##                         win3=c());
+
+nlsOutput <- data.frame(cusID=c(),
+                        amp=c(),
+                        off=c(),
+                        slp=c(),
+                        nls=c(),
+                        win1=c(),
+                        win2=c(),
+                        win3=c());
 
 ## for (i in 1:dim(big.means)[1]) {
 ##     cat(">>>", i, big.means$cusID[i], "\n");
