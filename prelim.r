@@ -205,7 +205,21 @@ water.resid <- waterTable %>%
 ##     geom_vline(aes(xintercept=-pi/6,color="red")) +
 ##     theme(legend.position="none")
 
+cat("For timeShift=", timeShift,
+", rmsResiduals=", water.means %>% filter(acctType=="Residential/Single Family") %>% select(rmsUsage) %>% sum(na.rm=TRUE), "\n");
+    
+      timeShifts <- c(timeShifts, timeShift);
+      resids <- c(resids, water.means %>% filter(acctType=="Residential/Single Family") %>% select(rmsUsage) %>% sum(na.rm=TRUE));
 
+
+residPlot <- tibble(resids=resids, timeShifts=timeShifts) %>%
+        ggplot(aes(x=timeShifts, y=resids)) +
+        geom_line() +
+        geom_point() +
+        xlab("Time Shift") +
+        ylab("Residual Errors") +
+        geom_vline(aes(xintercept=-pi/6,color="red")) +
+        theme(legend.position="none")
 
 system("date")
 
