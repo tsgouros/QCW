@@ -1,6 +1,6 @@
 ## This file just runs the regression machinery on the water billing data.
 
-timeShift <- pi/12;
+timeShift <- -pi/12;
 
 getComp <- function(usage, mmnth, myear) {
 
@@ -231,6 +231,8 @@ residPlot <- tibble(resids=resids, timeShifts=timeShifts) %>%
         ylab("Residual Errors") +
         geom_vline(aes(xintercept=-pi/6,color="red")) +
         theme(legend.position="none")
+
+print(residPlot)
 
 system("date")
 
