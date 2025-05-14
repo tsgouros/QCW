@@ -104,7 +104,7 @@ resids <- c();
 
 water.means <- waterTable %>%
   ##    filter(grepl("^J", subdiv)) %>%
-  group_by(account, parcel) %>%
+  group_by(account, parcel, customer) %>%
   dplyr::summarize(avg=mean(consumption),
                    mx=max(consumption),
                    avgchg=mean(currentTrans),
@@ -125,7 +125,7 @@ water.means <- waterTable %>%
                    taxProfile=first(taxProfile),                    
                    .groups="drop") %>%
   unpack(tmp) %>%
-  mutate(cusID=paste0(account, "-", parcel))
+  mutate(cusID=paste0(account, "-", parcel,"-", customer))
 
 ## big.means <- big %>%
 ##     filter(grepl("^J", subdiv)) %>%
@@ -181,7 +181,7 @@ nlsOutput <- data.frame(cusID=c(),
 ## Now take those model results and paste them back on the original
 ## data so we can calculate residuals to estimate errors.
 water.resid <- waterTable %>%
-    mutate(cusID=paste0(account, "-", parcel),
+    mutate(cusID=paste0(account, "-", parcel, "-", customer),
            cdate=(convertDateToInteger(readingYear, readingMonth) * (pi/6))) %>%
     right_join(water.means %>%
                select(cusID, avg, mx, amp, off, slp, win1, win2, win3),
@@ -190,11 +190,11 @@ water.resid <- waterTable %>%
            predResidual=(predUsage-consumption)^2);
     
     water.means <- water.resid %>%
-    group_by(account, parcel) %>%
+    group_by(account, parcel, customer) %>%
     dplyr::summarize(cusID=first(cusID),
                      rmsUsage = mean(predResidual)^0.5,
                      .groups="drop") %>%
-    select(-account, -parcel) %>%
+    select(-account, -parcel, -customer) %>%
     right_join(water.means, by="cusID")
 
 
@@ -217,10 +217,10 @@ water.resid <- waterTable %>%
 ##     theme(legend.position="none")
 
 cat("For timeShift=", timeShift,
-", rmsResiduals=", water.means %>% filter(acctType=="Residential/Single Family") %>% select(rmsUsage) %>% sum(na.rm=TRUE), "\n");
+", rmsResiduals=", water.means %>% filter(acctType=="Residential/Single Family", service=="Water") %>% select(rmsUsage) %>% sum(na.rm=TRUE), "\n");
     
       timeShifts <- c(timeShifts, timeShift);
-      resids <- c(resids, water.means %>% filter(acctType=="Residential/Single Family") %>% select(rmsUsage) %>% sum(na.rm=TRUE));
+      resids <- c(resids, water.means %>% filter(acctType=="Residential/Single Family", service=="Water") %>% select(rmsUsage) %>% sum(na.rm=TRUE));
 
 
 residPlot <- tibble(resids=resids, timeShifts=timeShifts) %>%
@@ -229,7 +229,7 @@ residPlot <- tibble(resids=resids, timeShifts=timeShifts) %>%
         geom_point() +
         xlab("Time Shift") +
         ylab("Residual Errors") +
-        geom_vline(aes(xintercept=-pi/6,color="red")) +
+        geom_vline(aes(xintercept=-pi/4,color="red")) +
         theme(legend.position="none")
 
 print(residPlot)
