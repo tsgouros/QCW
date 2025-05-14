@@ -104,7 +104,7 @@ resids <- c();
 
 water.means <- waterTable %>%
   ##    filter(grepl("^J", subdiv)) %>%
-  group_by(account, parcel, customer) %>%
+  group_by(account, parcel) %>%
   dplyr::summarize(avg=mean(consumption),
                    mx=max(consumption),
                    avgchg=mean(currentTrans),
@@ -125,7 +125,7 @@ water.means <- waterTable %>%
                    taxProfile=first(taxProfile),                    
                    .groups="drop") %>%
   unpack(tmp) %>%
-  mutate(cusID=paste0(account, "-", parcel,"-", customer))
+  mutate(cusID=paste0(account, "-", parcel))
 
 ## big.means <- big %>%
 ##     filter(grepl("^J", subdiv)) %>%
@@ -181,7 +181,7 @@ nlsOutput <- data.frame(cusID=c(),
 ## Now take those model results and paste them back on the original
 ## data so we can calculate residuals to estimate errors.
 water.resid <- waterTable %>%
-    mutate(cusID=paste0(account, "-", parcel, "-", customer),
+    mutate(cusID=paste0(account, "-", parcel),
            cdate=(convertDateToInteger(readingYear, readingMonth) * (pi/6))) %>%
     right_join(water.means %>%
                select(cusID, avg, mx, amp, off, slp, win1, win2, win3),
@@ -190,11 +190,11 @@ water.resid <- waterTable %>%
            predResidual=(predUsage-consumption)^2);
     
     water.means <- water.resid %>%
-    group_by(account, parcel, customer) %>%
+    group_by(account, parcel) %>%
     dplyr::summarize(cusID=first(cusID),
                      rmsUsage = mean(predResidual)^0.5,
                      .groups="drop") %>%
-    select(-account, -parcel, -customer) %>%
+    select(-account, -parcel) %>%
     right_join(water.means, by="cusID")
 
 
