@@ -372,7 +372,8 @@ billTable <- rbind(billTable19,
                    billTable22,
                    billTable23,
                    billTable24,
-                   billTable25)
+                   billTable25) %>%
+    as_tibble()
 
 cat("done with billTable\n");
 
