@@ -1,13 +1,12 @@
 ## This file just runs the regression machinery on the water billing data.
 
-timeShift <- -pi/12;
+getComp <- function(usage, rdate) {
 
-getComp <- function(usage, mmnth, myear) {
-
-    ## The months of our study period (7/2017 - 6/2022) expressed as
-    ## points on a circle.  2*pi equals one full year and pi/6 is one
-    ## month.
-    x <- convertDateToInteger(myear, mmnth) * (pi / 6);
+    ## The months of our study period expressed as points on a circle.
+    ## 2*pi equals one full year and pi/6 is one month.
+    x <- convertDate(rdate) * (pi / 6);
+    mmnth <- month(rdate);
+    myear <- year(rdate);
     ## Let's ignore data after 4/2021, for covid.
     ##usage <- usage[x < (3.75 * (2 * pi))]; 
     ##x <- x[x < (3.75 * (2 * pi))];
@@ -21,14 +20,16 @@ getComp <- function(usage, mmnth, myear) {
     ## See if we have enough points to fit our model.  
     out <- tryCatch({
         if (NMonths < 9) stop("not enough months");
-        model <- nls(y ~ ((amp) * (cos(x + timeShift) + 1)) + off + (slp * x),
+        model <- nls(y ~ ((amp) * (cos(x + tst) + 1)) + off + (slp * x),
                      data.frame(x=x, y=usage),
                      start=list(amp=0.05*(max(usage)-min(usage)),
                                 off=0.5*(max(usage)+min(usage)),
+                                tst=0,
                                 slp=0),
                      algorithm="port",
-                     lower=c(0,0,-(0.0005*(max(usage)-min(usage)))/max(x)),
-                     upper=c(10000000,10000000,
+                     lower=c(0,0,-pi/2,
+                             -(0.0005*(max(usage)-min(usage)))/max(x)),
+                     upper=c(10000000,10000000,pi/2,
                      (0.0002*(max(usage)-min(usage)))/max(x)));
 ###            slp <- 0;
             
@@ -37,6 +38,7 @@ getComp <- function(usage, mmnth, myear) {
         ## ... and return them as a single-row data frame.
         data.frame(amp=outPars[["amp"]],
                    off=outPars[["off"]],
+                   tst=outPars[["tst"]],
                    slp=outPars[["slp"]],
                    nls=TRUE);
     },
@@ -44,7 +46,7 @@ getComp <- function(usage, mmnth, myear) {
 
         if (length(usage) > 5) {
             ## The nls didn't work. Try the simpler method.
-            outPars <- list("amp"=0, "off"=0, "slp"=0);
+            outPars <- list("amp"=0, "off"=0, "tst"=0, "slp"=0);
             ## Figure out which months are Dec-Feb. 
             winter <- which((mmnth == 12) | (mmnth == 1) | (mmnth == 2));
 
@@ -61,42 +63,25 @@ getComp <- function(usage, mmnth, myear) {
 
             return(data.frame(amp = 0.5 * (fuzzyMax - winterMean),
                               off = winterMean,
+                              tst = 0,
                               slp = 0,
                               nls = FALSE));
         } else {
             return(out <- data.frame(amp = NA, 
                                      off = NA,
+                                     tst = NA,
                                      slp = NA,
                                      nls = FALSE));
         }            
     });
 
-    ## We also want to pick up averages for the specific winters.
-    win1 <- NA; win2 <- NA; win3 <- NA; win4 <- NA;
-    winMonths <- which((x > 2.6) & (x < 3.7));
-    if (length(winMonths) > 0) win1 <- mean(usage[winMonths]);
-    winMonths <- which((x > 2.6 + (2*pi)) & (x < 3.7 + (2*pi)));
-    if (length(winMonths) > 0) win2 <- mean(usage[winMonths]);
-    ## This is the covid winter (2020-2021)
-    winMonths <- which((x > 2.6 + (4*pi)) & (x < 3.7 + (4*pi)));
-    if (length(winMonths) > 0) win3 <- mean(usage[winMonths]);
-    winMonths <- which((x > 2.6 + (6*pi)) & (x < 3.7 + (6*pi)));
-    if (length(winMonths) > 0) win4 <- mean(usage[winMonths]);
-
-    out <- cbind(out, data.frame(win1=win1, win2=win2, win3=win3, win4=win4,
-                                 Nmnths=NMonths));
+    out <- cbind(out, data.frame(Nmnths=NMonths));
 
     return(out);
 }
 
 system("date")
 
-## timeShifts <- c();
-## resids <- c();
-## for (timeShift in seq(-pi/2, pi/2, by=pi/24)) {
-
-timeShifts <- c();
-resids <- c();
 
 ## Create a list of means and maxima for each account/parcel/rate
 ## combination.
@@ -117,7 +102,7 @@ water.means <- waterTable %>%
                    lon.orig=first(longitude),
                    startMonth=convertDateToInteger(first(readingYear), first(readingMonth)),
                    endMonth=convertDateToInteger(last(readingYear), last(readingMonth)),
-                   tmp=getComp(consumption, readingMonth, readingYear),
+                   tmp=getComp(consumption, readingDate),
                    januse=sum(ifelse(readingMonth==1,consumption,0)),
                    jansum=sum(ifelse(readingMonth==1,1,0)),
                    winuse=sum(ifelse((readingMonth==12)|(readingMonth==1)|(readingMonth==2),consumption,0)),
@@ -127,112 +112,25 @@ water.means <- waterTable %>%
   unpack(tmp) %>%
   mutate(cusID=paste0(account, "-", parcel))
 
-## big.means <- big %>%
-##     filter(grepl("^J", subdiv)) %>%
-##     group_by(acct, parcel, locID) %>%
-##     dplyr::summarize(avg=mean(usage),
-##                      mx=max(usage),
-##                      avgchg=mean(charge),
-##                      mxchg=max(charge),
-##                      acctAge=first(acctAge),
-##                      locClass=first(locClass),
-##                      class=first(class),
-##                      rate=first(rate),
-##                      subdiv=first(subdiv),
-##                      lat.orig=first(lat),
-##                      lon.orig=first(lon),
-##                      startMonth=convertDateToInteger(first(myear), first(mmnth)),
-##                      endMonth=convertDateToInteger(last(myear), last(mmnth)),
-##                      .groups="drop") %>%
-##     mutate(cusID=paste0(acct, "-", parcel, "-", locID));
-
-
-## nlsOutput <- data.frame(cusID=c(),
-##                         amp=c(),
-##                         off=c(),
-##                         slp=c(),
-##                         nls=c(),
-##                         win1=c(),
-##                         win2=c(),
-##                         win3=c());
-
-nlsOutput <- data.frame(cusID=c(),
-                        amp=c(),
-                        off=c(),
-                        slp=c(),
-                        nls=c(),
-                        win1=c(),
-                        win2=c(),
-                        win3=c());
-
-## for (i in 1:dim(big.means)[1]) {
-##     cat(">>>", i, big.means$cusID[i], "\n");
-##     tmp <- big %>%
-##         filter(acct==big.means$acct[i],
-##                parcel==big.means$parcel[i],
-##                locID==big.means$locID[i]);
-##     nlsOutput <- rbind(nlsOutput,
-##                        getComp(big.means$cusID[i], tmp$usage, tmp$mmnth, tmp$myear));
-## }
-
-## stop("aha")
-
 
 ## Now take those model results and paste them back on the original
 ## data so we can calculate residuals to estimate errors.
 water.resid <- waterTable %>%
     mutate(cusID=paste0(account, "-", parcel),
-           cdate=(convertDateToInteger(readingYear, readingMonth) * (pi/6))) %>%
+           cdate=(convertDate(readingDate) * (pi/6))) %>%
     right_join(water.means %>%
-               select(cusID, avg, mx, amp, off, slp, win1, win2, win3),
+               select(cusID, avg, mx, amp, off, tst, slp),
                by="cusID") %>%
-    mutate(predUsage = amp * (cos(cdate + timeShift) + 1) + off + (slp * cdate),
+    mutate(predUsage = amp * (cos(cdate + tst) + 1) + off + (slp * cdate),
            predResidual=(predUsage-consumption)^2);
     
-    water.means <- water.resid %>%
+water.means <- water.resid %>%
     group_by(account, parcel) %>%
     dplyr::summarize(cusID=first(cusID),
                      rmsUsage = mean(predResidual)^0.5,
                      .groups="drop") %>%
     select(-account, -parcel) %>%
     right_join(water.means, by="cusID")
-
-
-## ## Make a report of the residuals.
-## cat("For timeShift=", timeShift,
-##     ", rmsResiduals=", big.means %>% filter(class=="RESIDENTIAL") %>% select(rmsUsage) %>% sum(na.rm=TRUE), "\n");
-
-##     timeShifts <- c(timeShifts, timeShift);
-##     resids <- c(resids, big.means %>% filter(class=="RESIDENTIAL") %>% select(rmsUsage) %>% sum(na.rm=TRUE));
-
-## }
-##
-## residPlot <- tibble(resids=resids, timeShifts=timeShifts) %>%
-##     ggplot(aes(x=timeShifts, y=resids)) +
-##     geom_line() +
-##     geom_point() +
-##     xlab("Time Shift") +
-##     ylab("Residual Errors") +
-##     geom_vline(aes(xintercept=-pi/6,color="red")) +
-##     theme(legend.position="none")
-
-cat("For timeShift=", timeShift,
-", rmsResiduals=", water.means %>% filter(acctType=="Residential/Single Family", service=="Water") %>% select(rmsUsage) %>% sum(na.rm=TRUE), "\n");
-    
-      timeShifts <- c(timeShifts, timeShift);
-      resids <- c(resids, water.means %>% filter(acctType=="Residential/Single Family", service=="Water") %>% select(rmsUsage) %>% sum(na.rm=TRUE));
-
-
-residPlot <- tibble(resids=resids, timeShifts=timeShifts) %>%
-        ggplot(aes(x=timeShifts, y=resids)) +
-        geom_line() +
-        geom_point() +
-        xlab("Time Shift") +
-        ylab("Residual Errors") +
-        geom_vline(aes(xintercept=-pi/4,color="red")) +
-        theme(legend.position="none")
-
-print(residPlot)
 
 system("date")
 
