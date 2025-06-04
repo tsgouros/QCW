@@ -36,6 +36,15 @@ convertDateToInteger <- function(year, month) {
     return((year - 2019) * 12 + (month - 6));
 }
 
+## Convert a date into a floating-point number of months since 1/1/2019.
+convertDate <- function(date) {
+    monthDays <- 
+    return(((year(date) - 2019) * 12) +
+           (month(date) - 6) +
+           ((day(date) - 1)/(ifelse(month(date) %in% c(1,3,5,7,8,10,12), 31,
+                             ifelse(month(date) == 2, 28, 30)))));
+}
+
 ## *** GATHER DATA
 ##
 ##
