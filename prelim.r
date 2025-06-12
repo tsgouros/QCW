@@ -107,7 +107,8 @@ water.means <- waterTable %>%
                    jansum=sum(ifelse(readingMonth==1,1,0)),
                    winuse=sum(ifelse((readingMonth==12)|(readingMonth==1)|(readingMonth==2),consumption,0)),
                    winsum=sum(ifelse((readingMonth==12)|(readingMonth==1)|(readingMonth==2),1,0)),
-                   taxProfile=first(taxProfile),                    
+                   taxProfile=first(taxProfile),
+                   cycle=last(cycle),
                    .groups="drop") %>%
   unpack(tmp) %>%
   mutate(cusID=paste0(account, "-", parcel))
