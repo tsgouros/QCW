@@ -80,8 +80,7 @@ getComp <- function(usage, rdate) {
     return(out);
 }
 
-system("date")
-
+cat("start prelim at", now, "\n");
 
 ## Create a list of means and maxima for each account/parcel/rate
 ## combination.
@@ -98,8 +97,8 @@ water.means <- waterTable %>%
                    revClass=first(revenueClass),
                    service=first(service),
                    subdiv=first(subdivision),
-                   lat.orig=first(latitude),
-                   lon.orig=first(longitude),
+                   latitude=first(latitude),
+                   longitude=first(longitude),
                    startMonth=convertDateToInteger(first(readingYear), first(readingMonth)),
                    endMonth=convertDateToInteger(last(readingYear), last(readingMonth)),
                    tmp=getComp(consumption, readingDate),
@@ -134,6 +133,6 @@ water.means <- water.resid %>%
     select(-account, -parcel) %>%
     right_join(water.means, by="cusID")
 
-system("date")
+cat("end prelim at", now, "\n");
 
 
