@@ -108,6 +108,7 @@ water.means <- waterTable %>%
                    winuse=sum(ifelse((readingMonth==12)|(readingMonth==1)|(readingMonth==2),consumption,0)),
                    winsum=sum(ifelse((readingMonth==12)|(readingMonth==1)|(readingMonth==2),1,0)),
                    taxProfile=first(taxProfile),
+                   waterUseSegment=first(waterUseSegment),
                    cycle=last(cycle),
                    .groups="drop") %>%
   unpack(tmp) %>%
