@@ -376,9 +376,3 @@ billTable <- rbind(billTable19,
     as_tibble()
 
 cat("done with billTable\n");
-
-meterTable <- read.csv("data/BIF005 Rate Report.csv",
-                         col.names=c("account","meter","dateMeterInstalled","dateMeterRemoved",
-                                     "rateCode")) %>% as_tibble()
-
-cat("done with meterTable\n");
