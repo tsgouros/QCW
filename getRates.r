@@ -1,9 +1,12 @@
 
 ## First get a table of account and meters with rate codes.
-rateCodes <- read.csv("data/rateData/BIF005 Rate Report.csv") %>%
-    mutate(DateMeterInstalled=mdy(DateMeterInstalled),
-           DateMeterRemoved=mdy(DateMeterRemoved)) %>%
-    as_tibble()
+rateCodes <- read.csv("data/rateData/BIF005 Rate Report.csv",
+    col.names=c("account","meter","dateMeterInstalled","dateMeterRemoved","rateCode")) %>%
+    as_tibble() %>%
+    mutate(dateMeterInstalled=mdy(dateMeterInstalled),
+           dateMeterRemoved=mdy(dateMeterRemoved),
+           meterID=paste0(account,"-",meter));
+    
 
 rates <- read_excel("data/rateData/rate-fee-and-tiers.xlsx") %>%
     mutate(baseFee=ifelse(is.na(baseFee),lag(baseFee),baseFee))
