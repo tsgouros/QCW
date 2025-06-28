@@ -215,7 +215,8 @@ readingTable <- rbind(readingTable19,
                       readingTable25) %>%
               mutate(consumption=as.numeric(consumption),
                      previousReading=as.numeric(previousReading),
-                     currentReading=as.numeric(currentReading))
+                     currentReading=as.numeric(currentReading),
+                     meterID=paste0(account,"-",meter))
   
   cat("done with readingtable\n")
 
