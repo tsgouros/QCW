@@ -110,6 +110,7 @@ water.means <- waterTable %>%
                    waterUseSegment=first(waterUseSegment),
                    revenueClass=first(revenueClass),
                    cycle=last(cycle),
+                   rateCode=last(rateCode),
                    .groups="drop") %>%
   unpack(tmp) %>%
   mutate(cusID=paste0(account, "-", parcel))
