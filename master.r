@@ -16,7 +16,7 @@ updateBillingData <- FALSE;
 ## ... and the county data.
 updateCountyData <- FALSE;
 ## Assemble the big waterTable.
-assembleWaterTable <- FALSE;
+assembleWaterTable <- TRUE;
 ## Doing the sampling and preliminary processing of the big pile of data.
 updateRegression <- TRUE;
 ## We're going to make some projections of usage, and probably
@@ -86,7 +86,7 @@ if (assembleWaterTable) {
                           previousReading, consumption,
                           readingDate, readingMonth, readStatus,
                           previousReadingDate, previousReadingMonth,
-                          readingYear) %>%
+                          readingYear,meterID) %>%
                    ## there are records where the following is not
                    ## true, seem mostly to be from 2/2023.
                    filter(consumption == (currentReading - previousReading)),
@@ -122,6 +122,17 @@ if (assembleWaterTable) {
     cat("skip assembling waterTable\n");
 }
 
+##Add rate codes to water table
+
+merged_table <- merge(waterTable,rateCodes,by="meterID")
+
+waterTable <- merged_table %>%
+  select(-ends_with(".y")) %>%
+  mutate(account=account.x,
+         meter=meter.x) %>%
+  select(-ends_with(".x"))
+
+rm(merged_table)
 
 ## Combine the big and waterTable usage records. Watch out, this one
 ## can take a long time, depending on the flags set over there.
