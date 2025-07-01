@@ -94,6 +94,7 @@ water.means <- waterTable %>%
                    avgchg=mean(currentTrans),
                    mxchg=max(currentTrans),
                    acctType=first(accountType),
+                   meter=last(meter),
                    revClass=first(revenueClass),
                    service=first(service),
                    subdiv=first(subdivision),
@@ -121,7 +122,7 @@ water.resid <- waterTable %>%
     mutate(cusID=paste0(account, "-", parcel),
            cdate=(convertDate(readingDate) * (pi/6))) %>%
     right_join(water.means %>%
-               select(cusID, avg, mx, amp, off, tst, slp),
+               select(cusID, avg, mx, amp, off, tst, slp, nls),
                by="cusID") %>%
     mutate(predUsage = amp * (cos(cdate + tst) + 1) + off + (slp * cdate),
            predResidual=(predUsage-consumption)^2);
