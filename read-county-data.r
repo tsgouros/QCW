@@ -532,9 +532,11 @@ maricopa <- tibble(parcel=merged$parcel,
                    pool=ifelse(is.na(merged$poolArea),FALSE,TRUE),
                    yearbuilt=merged$constructionYear);
 
-filtered_maricopa <- filter(maricopa, parcel %in% addressTable$parcel)
+if (cleanup) rm(merged,r1770,residentialCounty);
 
-prop <- rbind(pinal, filtered_maricopa);
+filtered.maricopa <- filter(maricopa, parcel %in% addressTable$parcel)
 
+prop <- rbind(pinal, filtered.maricopa);
 
+if (cleanup) rm(pinal,mari,filtered_maricopa;
 
