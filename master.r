@@ -15,6 +15,8 @@ library(ggrepel)
 updateBillingData <- FALSE;
 ## ... and the county data.
 updateCountyData <- FALSE;
+## This one is quick.
+updateRateData <- TRUE
 ## Assemble the big waterTable.
 assembleWaterTable <- TRUE;
 ## Doing the sampling and preliminary processing of the big pile of data.
@@ -32,7 +34,7 @@ updateLocationData <- TRUE;
 ## saveGraphs <- FALSE;
 
 ## Not time consuming, but this data is good for debugging.
-## cleanup <- FALSE;
+cleanup <- TRUE;
 
 ## To establish consistency in creating the time base from year and
 ## month data.
@@ -61,13 +63,13 @@ if (updateBillingData) {
 
 ##
 ## Read the property data from Maricopa and Pinal counties.
+## This creates a big array called 'prop'.
 if (updateCountyData) {
     cat("reading county data\n");
     source("read-county-data.r");
 } else {
     cat("skip reading county data\n");
 }
-## This creates a big array called 'prop'.
 
 if (assembleWaterTable) {
     cat("assembling waterTable\n");
@@ -122,17 +124,19 @@ if (assembleWaterTable) {
     cat("skip assembling waterTable\n");
 }
 
+
+## Get the rate data.
+if (updateRateData) {
+    cat("reading rate data\n");
+    source("getRates.r");
+} else {
+    cat("skipping updating rate data\n");
+}
+
 ##Add rate codes to water table
+waterTable <- waterTable %>%
+    left_join(rateCodes, by=c("account","meter"))
 
-merged_table <- merge(waterTable,rateCodes,by="meterID")
-
-waterTable <- merged_table %>%
-  select(-ends_with(".y")) %>%
-  mutate(account=account.x,
-         meter=meter.x) %>%
-  select(-ends_with(".x"))
-
-rm(merged_table)
 
 ## Combine the big and waterTable usage records. Watch out, this one
 ## can take a long time, depending on the flags set over there.
