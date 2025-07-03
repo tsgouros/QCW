@@ -2,6 +2,11 @@
 library(lubridate)
 library(tidyverse)
 
+## The data files seem to have latin1 encodings in the address and name
+## fields. We don't really use those fields, so this doesn't matter much,
+## but if it's not specified, the data files don't read completely.
+options(encoding="latin1")
+
 
 readingTable19 <- read.csv("data/2019 BIF016 report.csv",
                            col.names=c("billNumber", "account", "service",
@@ -217,8 +222,16 @@ readingTable <- rbind(readingTable19,
                      previousReading=as.numeric(previousReading),
                      currentReading=as.numeric(currentReading),
                      meterID=paste0(account,"-",meter))
-  
-  cat("done with readingtable\n")
+
+if (cleanup) rm(readingTable19,
+                readingTable20,
+                readingTable21,
+                readingTable22,
+                readingTable23,
+                readingTable24,
+                readingTable25)
+
+cat("done with readingtable\n")
 
 addressTable <- read.csv("data/Updated BIF002 Report.csv",
                          col.names=c("streetNum","streetName","unit",
@@ -255,113 +268,134 @@ customerTable <- read.csv("data/Updated BIF003 Report.csv",
 
 cat("done with customerTable\n");
 
-billTable19 <- read.csv("data/2019 BIF951 Report.csv",
-                        col.names=c("billNumber","billDate","accountType",
-                                    "needsPayment","batchID","bif951pk",
-                                    "billPrint","billGroup","billStat","billType",
-                                    "chgBill","cycle","book","cancel","account",
-                                    "customer","customerAcctID","dueDate",
-                                    "paymentProfile","processed","serAdd",
-                                    "balanceForward","previousBilling",
-                                    "sinceLastBill","currentTrans","cancelledBilling",
-                                    "amountDue","addressType","address1",
-                                    "address2","address3","address4","address5","address6")) %>%
+billTable19 <-
+    read.csv("data/2019 BIF951 Report.csv",
+             col.names=c("billNumber","billDate","accountType",
+                         "needsPayment","batchID","bif951pk",
+                         "billPrint","billGroup","billStat","billType",
+                         "chgBill","cycle","book","cancel","account",
+                         "customer","customerAcctID","dueDate",
+                         "paymentProfile","processed","serAdd",
+                         "balanceForward","previousBilling",
+                         "sinceLastBill","currentTrans","cancelledBilling",
+                         "amountDue","addressType","address1",
+                         "address2","address3","address4",
+                         "address5","address6"),
+             fileEncoding="latin1") %>%
   as_tibble() %>%
   mutate(billDate=mdy(billDate),
          billMonth=month(billDate),
          billYear=year(billDate));
 
-billTable20 <- read.csv("data/2020 BIF951 Report.csv",
-                        col.names=c("billNumber","billDate","accountType",
-                                    "needsPayment","batchID","bif951pk",
-                                    "billPrint","billGroup","billStat","billType",
-                                    "chgBill","cycle","book","cancel","account",
-                                    "customer","customerAcctID","dueDate",
-                                    "paymentProfile","processed","serAdd",
-                                    "balanceForward","previousBilling",
-                                    "sinceLastBill","currentTrans","cancelledBilling",
-                                    "amountDue","addressType","address1",
-                                    "address2","address3","address4","address5","address6")) %>%
+billTable20 <-
+    read.csv("data/2020 BIF951 Report.csv",
+             col.names=c("billNumber","billDate","accountType",
+                         "needsPayment","batchID","bif951pk",
+                         "billPrint","billGroup","billStat","billType",
+                         "chgBill","cycle","book","cancel","account",
+                         "customer","customerAcctID","dueDate",
+                         "paymentProfile","processed","serAdd",
+                         "balanceForward","previousBilling",
+                         "sinceLastBill","currentTrans","cancelledBilling",
+                         "amountDue","addressType","address1",
+                         "address2","address3","address4",
+                         "address5","address6"),
+             fileEncoding="latin1") %>%
   as_tibble() %>%
   mutate(billDate=mdy(billDate),
          billMonth=month(billDate),
          billYear=year(billDate));
 
-billTable21 <- read.csv("data/2021 BIF951 Report.csv",
-                        col.names=c("billNumber","billDate","accountType",
-                                    "needsPayment","batchID","bif951pk",
-                                    "billPrint","billGroup","billStat","billType",
-                                    "chgBill","cycle","book","cancel","account",
-                                    "customer","customerAcctID","dueDate",
-                                    "paymentProfile","processed","serAdd",
-                                    "balanceForward","previousBilling",
-                                    "sinceLastBill","currentTrans","cancelledBilling",
-                                    "amountDue","addressType","address1",
-                                    "address2","address3","address4","address5","address6")) %>%
+billTable21 <-
+    read.csv("data/2021 BIF951 Report.csv",
+             col.names=c("billNumber","billDate","accountType",
+                         "needsPayment","batchID","bif951pk",
+                         "billPrint","billGroup","billStat","billType",
+                         "chgBill","cycle","book","cancel","account",
+                         "customer","customerAcctID","dueDate",
+                         "paymentProfile","processed","serAdd",
+                         "balanceForward","previousBilling",
+                         "sinceLastBill","currentTrans","cancelledBilling",
+                         "amountDue","addressType","address1",
+                         "address2","address3","address4",
+                         "address5","address6"),
+             fileEncoding="latin1") %>%
   as_tibble() %>%
   mutate(billDate=mdy(billDate),
          billMonth=month(billDate),
          billYear=year(billDate));
 
-billTable22 <- read.csv("data/2022 BIF951 Report.csv",
-                        col.names=c("billNumber","billDate","accountType",
-                                    "needsPayment","batchID","bif951pk",
-                                    "billPrint","billGroup","billStat","billType",
-                                    "chgBill","cycle","book","cancel","account",
-                                    "customer","customerAcctID","dueDate",
-                                    "paymentProfile","processed","serAdd",
-                                    "balanceForward","previousBilling",
-                                    "sinceLastBill","currentTrans","cancelledBilling",
-                                    "amountDue","addressType","address1",
-                                    "address2","address3","address4","address5","address6")) %>%
+billTable22 <-
+    read.csv("data/2022 BIF951 Report.csv",
+             col.names=c("billNumber","billDate","accountType",
+                         "needsPayment","batchID","bif951pk",
+                         "billPrint","billGroup","billStat","billType",
+                         "chgBill","cycle","book","cancel","account",
+                         "customer","customerAcctID","dueDate",
+                         "paymentProfile","processed","serAdd",
+                         "balanceForward","previousBilling",
+                         "sinceLastBill","currentTrans","cancelledBilling",
+                         "amountDue","addressType","address1",
+                         "address2","address3","address4",
+                         "address5","address6"),
+             fileEncoding="latin1") %>%
   as_tibble() %>%
   mutate(billDate=mdy(billDate),
          billMonth=month(billDate),
          billYear=year(billDate));
 
-billTable23 <- read.csv("data/2023 BIF951 Report.csv",
-                        col.names=c("billNumber","billDate","accountType",
-                                    "needsPayment","batchID","bif951pk",
-                                    "billPrint","billGroup","billStat","billType",
-                                    "chgBill","cycle","book","cancel","account",
-                                    "customer","customerAcctID","dueDate",
-                                    "paymentProfile","processed","serAdd",
-                                    "balanceForward","previousBilling",
-                                    "sinceLastBill","currentTrans","cancelledBilling",
-                                    "amountDue","addressType","address1",
-                                    "address2","address3","address4","address5","address6")) %>%
+billTable23 <-
+    read.csv("data/2023 BIF951 Report.csv",
+             col.names=c("billNumber","billDate","accountType",
+                         "needsPayment","batchID","bif951pk",
+                         "billPrint","billGroup","billStat","billType",
+                         "chgBill","cycle","book","cancel","account",
+                         "customer","customerAcctID","dueDate",
+                         "paymentProfile","processed","serAdd",
+                         "balanceForward","previousBilling",
+                         "sinceLastBill","currentTrans","cancelledBilling",
+                         "amountDue","addressType","address1",
+                         "address2","address3","address4",
+                         "address5","address6"),
+             fileEncoding="latin1") %>%
   as_tibble() %>%
   mutate(billDate=mdy(billDate),
          billMonth=month(billDate),
          billYear=year(billDate));
 
-billTable24 <- read.csv("data/2024 BIF951 Report.csv",
-                        col.names=c("billNumber","billDate","accountType",
-                                    "needsPayment","batchID","bif951pk",
-                                    "billPrint","billGroup","billStat","billType",
-                                    "chgBill","cycle","book","cancel","account",
-                                    "customer","customerAcctID","dueDate",
-                                    "paymentProfile","processed","serAdd",
-                                    "balanceForward","previousBilling",
-                                    "sinceLastBill","currentTrans","cancelledBilling",
-                                    "amountDue","addressType","address1",
-                                    "address2","address3","address4","address5","address6")) %>%
+billTable24 <-
+    read.csv("data/2024 BIF951 Report.csv",
+             col.names=c("billNumber","billDate","accountType",
+                         "needsPayment","batchID","bif951pk",
+                         "billPrint","billGroup","billStat","billType",
+                         "chgBill","cycle","book","cancel","account",
+                         "customer","customerAcctID","dueDate",
+                         "paymentProfile","processed","serAdd",
+                         "balanceForward","previousBilling",
+                         "sinceLastBill","currentTrans","cancelledBilling",
+                         "amountDue","addressType","address1",
+                         "address2","address3","address4",
+                         "address5","address6"),
+             fileEncoding="latin1") %>%
   as_tibble() %>%
   mutate(billDate=mdy(billDate),
          billMonth=month(billDate),
          billYear=year(billDate));
 
-billTable25 <- read.csv("data/2025 BIF951 Report.csv",
-                        col.names=c("billNumber","billDate","accountType",
-                                    "needsPayment","batchID","bif951pk",
-                                    "billPrint","billGroup","billStat","billType",
-                                    "chgBill","cycle","book","cancel","account",
-                                    "customer","customerAcctID","dueDate",
-                                    "paymentProfile","processed","serAdd",
-                                    "balanceForward","previousBilling",
-                                    "sinceLastBill","currentTrans","cancelledBilling",
-                                    "amountDue","addressType","address1",
-                                    "address2","address3","address4","address5","address6")) %>%
+billTable25 <-
+    read.csv("data/2025 BIF951 Report.csv",
+             col.names=c("billNumber","billDate","accountType",
+                         "needsPayment","batchID","bif951pk",
+                         "billPrint","billGroup","billStat","billType",
+                         "chgBill","cycle","book","cancel","account",
+                         "customer","customerAcctID","dueDate",
+                         "paymentProfile","processed","serAdd",
+                         "balanceForward","previousBilling",
+                         "sinceLastBill","currentTrans","cancelledBilling",
+                         "amountDue","addressType","address1",
+                         "address2","address3","address4",
+                         "address5","address6"),
+             fileEncoding="latin1") %>%
   as_tibble() %>%
   mutate(billDate=mdy(billDate),
          billMonth=month(billDate),
@@ -375,5 +409,13 @@ billTable <- rbind(billTable19,
                    billTable24,
                    billTable25) %>%
     as_tibble()
+
+if (cleanup) rm(billTable19,
+                billTable20,
+                billTable21,
+                billTable22,
+                billTable23,
+                billTable24,
+                billTable25)
 
 cat("done with billTable\n");
