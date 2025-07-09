@@ -233,6 +233,20 @@ if (cleanup) rm(readingTable19,
 
 cat("done with readingtable\n")
 
+## Get the rate data and add them to the reading table.
+source("getRates.r");
+
+## Note that there are multiple rateCode records for some account/meter
+## combinations because of some equipment swap events. 
+readingTable  <- readingTable %>%
+    left_join(rateCodes %>%
+              select(account,meter,rateCode),
+              by=c("account","meter"),
+              relationship="many-to-many",
+              multiple="last")
+
+cat("done with getting rate data\n");
+
 addressTable <- read.csv("data/Updated BIF002 Report.csv",
                          col.names=c("streetNum","streetName","unit",
                                      "account","streetPrefix",
