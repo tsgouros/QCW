@@ -15,8 +15,6 @@ library(ggrepel)
 updateBillingData <- FALSE;
 ## ... and the county data.
 updateCountyData <- FALSE;
-## This one is quick.
-updateRateData <- TRUE
 ## Assemble the big waterTable.
 assembleWaterTable <- TRUE;
 ## Doing the sampling and preliminary processing of the big pile of data.
@@ -24,7 +22,6 @@ updateRegression <- TRUE;
 ## We're going to make some projections of usage, and probably
 ## revenue, too so we need the location data in an easy-to-use format.
 updateLocationData <- TRUE;
-
 
 
 ## Creating the model with account data and growth projections
@@ -123,19 +120,6 @@ if (assembleWaterTable) {
 } else {
     cat("skip assembling waterTable\n");
 }
-
-
-## Get the rate data.
-if (updateRateData) {
-    cat("reading rate data\n");
-    source("getRates.r");
-} else {
-    cat("skipping updating rate data\n");
-}
-
-##Add rate codes to water table
-waterTable <- waterTable %>%
-    left_join(rateCodes, by=c("account","meter"))
 
 
 ## Combine the big and waterTable usage records. Watch out, this one
