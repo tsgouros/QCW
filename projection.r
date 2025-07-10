@@ -82,11 +82,10 @@ rates <- tibble(revenueClass=c("",
                 rate=c(1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8))
 
 ## Project consumption for each user, and apply the rates to that.
-w <- water.means %>%
+w <- waterMeans %>%
     projectConsumption(2025,6) %>%
     group_by(revenueClass) %>%
     dplyr::summarize(usage = sum(predUsage, na.rm=TRUE)) %>%
     left_join(rates, by="revenueClass") %>%
     mutate(predRevenue = usage * rate)
 
-                               

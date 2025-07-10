@@ -12,7 +12,7 @@ library(ggrepel)
 ## These are the time-consuming tasks, with flags to run them or not.
 
 ## Getting the more recent billing data.
-updateBillingData <- FALSE;
+updateBillingData <- TRUE;
 ## ... and the county data.
 updateCountyData <- FALSE;
 ## Assemble the big waterTable.
@@ -82,7 +82,7 @@ if (assembleWaterTable) {
                                 billMonth))) %>%
         right_join(readingTable %>%
                    select(billNumber, service, meter, currentReading,
-                          previousReading, consumption,
+                          previousReading, consumption, rateCode,
                           readingDate, readingMonth, readStatus,
                           previousReadingDate, previousReadingMonth,
                           readingYear,meterID) %>%
@@ -134,7 +134,7 @@ if (updateRegression) {
 ## Bring in precipitation and temperature records
 ##source("rain.r")
 
-## Add location data to the waterTable and water.means tables. This is
+## Add location data to the waterTable and waterMeans tables. This is
 ## both the property data from the county assessors and the TAZ
 ## data. The TAZ data is essential because we need some area within
 ## which to estimate usage and do our sampling.
@@ -152,8 +152,8 @@ if (updateLocationData) {
         filter(parcel != "") %>%
         distinct()
 
-    water.means <- water.means %>% left_join(locData, by="parcel")
-    water.resid <- water.resid %>% left_join(locData, by="parcel")
+    waterMeans <- waterMeans %>% left_join(locData, by="parcel")
+    waterResid <- waterResid %>% left_join(locData, by="parcel")
 } else {
     cat("skip update location data\n");
 }

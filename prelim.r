@@ -84,57 +84,58 @@ cat("start prelim at", format_ISO8601(now(),tz="UTC"), "\n");
 
 ## Create a list of means and maxima for each account/parcel/rate
 ## combination.
-## Updated 5-6-25 with waterTable fields
-
-water.means <- waterTable %>%
-  ##    filter(grepl("^J", subdiv)) %>%
-  group_by(account, parcel) %>%
-  dplyr::summarize(avg=mean(consumption),
-                   mx=max(consumption),
-                   avgchg=mean(currentTrans),
-                   mxchg=max(currentTrans),
-                   acctType=first(accountType),
-                   meter=last(meter),
-                   revClass=first(revenueClass),
-                   service=first(service),
-                   subdiv=first(subdivision),
-                   latitude=first(latitude),
-                   longitude=first(longitude),
-                   startMonth=convertDateToInteger(first(readingYear), first(readingMonth)),
-                   endMonth=convertDateToInteger(last(readingYear), last(readingMonth)),
-                   tmp=getComp(consumption, readingDate),
-                   januse=sum(ifelse(readingMonth==1,consumption,0)),
-                   jansum=sum(ifelse(readingMonth==1,1,0)),
-                   winuse=sum(ifelse((readingMonth==12)|(readingMonth==1)|(readingMonth==2),consumption,0)),
-                   winsum=sum(ifelse((readingMonth==12)|(readingMonth==1)|(readingMonth==2),1,0)),
-                   taxProfile=first(taxProfile),
-                   waterUseSegment=first(waterUseSegment),
-                   revenueClass=first(revenueClass),
-                   cycle=last(cycle),
-                   rateCode=last(rateCode),
-                   .groups="drop") %>%
-  unpack(tmp) %>%
-  mutate(cusID=paste0(account, "-", parcel))
-
+waterMeans <- waterTable %>%
+    mutate(cusID=paste0(account, "-", parcel, "-", rateCode)) %>%
+    group_by(cusID) %>%
+    dplyr::summarize(account=first(account),
+                     parcel=first(parcel),
+                     rateCode=first(rateCode),
+                     avg=mean(consumption),
+                     mx=max(consumption),
+                     avgchg=mean(currentTrans),
+                     mxchg=max(currentTrans),
+                     acctType=first(accountType),
+                     meter=last(meter),
+                     revClass=first(revenueClass),
+                     service=first(service),
+                     subdiv=first(subdivision),
+                     latitude=first(latitude),
+                     longitude=first(longitude),
+                     startMonth=convertDateToInteger(first(readingYear),
+                                                     first(readingMonth)),
+                     endMonth=convertDateToInteger(last(readingYear),
+                                                   last(readingMonth)),
+                     tmp=getComp(consumption, readingDate),
+                     januse=sum(ifelse(readingMonth==1,consumption,0)),
+                     jansum=sum(ifelse(readingMonth==1,1,0)),
+                     winuse=sum(ifelse((readingMonth==12)|(readingMonth==1)|(readingMonth==2),consumption,0)),
+                     winsum=sum(ifelse((readingMonth==12)|(readingMonth==1)|(readingMonth==2),1,0)),
+                     taxProfile=first(taxProfile),
+                     waterUseSegment=first(waterUseSegment),
+                     revenueClass=first(revenueClass),
+                     cycle=last(cycle),
+                     rateCode=last(rateCode),
+                     .groups="drop") %>%
+    unpack(tmp)
 
 ## Now take those model results and paste them back on the original
 ## data so we can calculate residuals to estimate errors.
-water.resid <- waterTable %>%
-    mutate(cusID=paste0(account, "-", parcel),
+waterResid <- waterTable %>%
+    mutate(cusID=paste0(account, "-", parcel, "-", rateCode),
            cdate=(convertDate(readingDate) * (pi/6))) %>%
-    right_join(water.means %>%
+    right_join(waterMeans %>%
                select(cusID, avg, mx, amp, off, tst, slp, nls),
                by="cusID") %>%
     mutate(predUsage = amp * (cos(cdate + tst) + 1) + off + (slp * cdate),
            predResidual=(predUsage-consumption)^2);
     
-water.means <- water.resid %>%
+waterMeans <- waterResid %>%
     group_by(account, parcel) %>%
     dplyr::summarize(cusID=first(cusID),
                      rmsUsage = mean(predResidual)^0.5,
                      .groups="drop") %>%
     select(-account, -parcel) %>%
-    right_join(water.means, by="cusID")
+    right_join(waterMeans, by="cusID")
 
 cat("end prelim at", format_ISO8601(now(),tz="UTC"), "\n");
 
