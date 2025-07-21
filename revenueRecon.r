@@ -38,7 +38,15 @@ dateStrings <- rev %>%
                      dateString=paste0(month, "/", year)) %>%
     select(billMonth, dateString)
 
-breaks=seq(0,75,3)
+dateStrings[26,1] <- 72;
+dateStrings[26,2] <- "6/2025";
+
+breaks <- seq(48,72,3)
+
+labels <- dateStrings %>%
+    filter(billMonth %in% breaks) %>%
+    select(dateString) %>%
+    unlist()
 
 revPlot <- rev %>%
 ##    filter(accountType=="Residential/Single Family") %>%
@@ -53,7 +61,7 @@ revPlot <- rev %>%
                data=actualRev %>% group_by(month) %>%
                    dplyr::summarize(revenue=sum(revenue,na.rm=TRUE))) +
     scale_x_continuous(breaks=breaks,
-                       labels=dateStrings$dateString[breaks+6],
+                       labels=labels,
                        limits=c(47,NA),
                        name="") +
     scale_y_continuous(breaks=seq(0,4e6,1e6),
