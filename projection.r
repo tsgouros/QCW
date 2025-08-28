@@ -70,22 +70,14 @@ projectConsumption <- function(wmeans, dyear, dmonth) {
         
 }
 
-## Use like this.  First select a bunch of rates.
-rates <- tibble(revenueClass=c("",
-                                  "SCHOOL/LARGE TURF 10+ ACRES", 
-                                  "SCHOOL",
-                                  "HOMEOWNERS ASSOCIATION",
-                                  "HOA/LARGE TURF 10+ ACRES",
-                                  "LARGE TURF 10+ ACRES",
-                                  "RECOVERED EFFLUENT",
-                                  "BULK CONSTRUCTION IRRIGATION"),
-                rate=c(1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8))
 
-## Project consumption for each user, and apply the rates to that.
-w <- waterMeans %>%
-    projectConsumption(2025,6) %>%
-    group_by(revenueClass) %>%
-    dplyr::summarize(usage = sum(predUsage, na.rm=TRUE)) %>%
-    left_join(rates, by="revenueClass") %>%
-    mutate(predRevenue = usage * rate)
+rev0625 <- projectConsumption(waterMeans, 2025, 6) %>%
+    left_join(rates,by="rateCode") %>%
+    mutate(predBillAmount=applyWaterRate(predUsage,baseFee,t1,t2,t3,t4))
 
+rev0725 <- projectConsumption(waterMeans, 2025, 7) %>%
+    left_join(rates,by="rateCode") %>%
+    mutate(predBillAmount=applyWaterRate(predUsage,baseFee,t1,t2,t3,t4))
+
+
+##waterResid %>% filter(readingDate > mdy("4/30/2025")) %>% mutate(readingDate = readingDate %m+% months(1), billDate = billDate %m+% months(1))
