@@ -82,7 +82,7 @@ if (assembleWaterTable) {
                                 billMonth))) %>%
         right_join(readingTable %>%
                    select(billNumber, service, meter, currentReading,
-                          previousReading, consumption, rateCode,
+                          previousReading, consumption, rateCode, meterBoxID,
                           readingDate, readingMonth, readStatus,
                           previousReadingDate, previousReadingMonth,
                           readingYear,meterID) %>%

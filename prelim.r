@@ -96,6 +96,7 @@ waterMeans <- waterTable %>%
                      mxchg=max(currentTrans),
                      acctType=first(accountType),
                      meter=last(meter),
+                     meterBoxID=last(meterBoxID),
                      revClass=first(revenueClass),
                      service=first(service),
                      subdiv=first(subdivision),

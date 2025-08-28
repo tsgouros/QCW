@@ -1,7 +1,9 @@
+library(tidyverse)
+library(readxl)
 
 ## First get a table of account and meters with rate codes.
 rateCodes <- read.csv("data/rateData/BIF005 Rate Report.csv",
-    col.names=c("account","meter","dateMeterInstalled","dateMeterRemoved","rateCode")) %>%
+    col.names=c("account","meter","dateMeterInstalled","dateMeterRemoved","rateCode","meterBoxID")) %>%
     as_tibble() %>%
     mutate(dateMeterInstalled=mdy(dateMeterInstalled),
            dateMeterRemoved=mdy(dateMeterRemoved),

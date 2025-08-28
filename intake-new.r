@@ -218,10 +218,11 @@ readingTable <- rbind(readingTable19,
                       readingTable23,
                       readingTable24,
                       readingTable25) %>%
-              mutate(consumption=as.numeric(consumption),
-                     previousReading=as.numeric(previousReading),
-                     currentReading=as.numeric(currentReading),
-                     meterID=paste0(account,"-",meter))
+    filter(readingDate > mdy("4/1/2023")) %>%
+    mutate(consumption=as.numeric(consumption),
+           previousReading=as.numeric(previousReading),
+           currentReading=as.numeric(currentReading),
+           meterID=paste0(account,"-",meter))
 
 if (cleanup) rm(readingTable19,
                 readingTable20,
@@ -240,7 +241,7 @@ source("getRates.r");
 ## combinations because of some equipment swap events. 
 readingTable  <- readingTable %>%
     left_join(rateCodes %>%
-              select(account,meter,rateCode),
+              select(account,meter,rateCode,meterBoxID),
               by=c("account","meter"),
               relationship="many-to-many",
               multiple="last")
@@ -422,6 +423,7 @@ billTable <- rbind(billTable19,
                    billTable23,
                    billTable24,
                    billTable25) %>%
+    filter(billDate > mdy("5/1/2023")) %>%
     as_tibble()
 
 if (cleanup) rm(billTable19,
