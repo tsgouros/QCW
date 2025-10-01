@@ -72,11 +72,15 @@ projectConsumption <- function(wmeans, dyear, dmonth) {
 
 
 rev0625 <- projectConsumption(waterMeans, 2025, 6) %>%
-    left_join(rates,by="rateCode") %>%
+    mutate(readingDate=ymd("2025-06-27")) %>%
+    left_join(rates, join_by(rateCode,
+                             closest(readingDate <= validUntilDate))) %>%
     mutate(predBillAmount=applyWaterRate(predUsage,baseFee,t1,t2,t3,t4))
 
 rev0725 <- projectConsumption(waterMeans, 2025, 7) %>%
-    left_join(rates,by="rateCode") %>%
+    mutate(readingDate=ymd("2025-07-27")) %>%
+    left_join(rates, join_by(rateCode,
+                             closest(readingDate <= validUntilDate))) %>%
     mutate(predBillAmount=applyWaterRate(predUsage,baseFee,t1,t2,t3,t4))
 
 
