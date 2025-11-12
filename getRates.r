@@ -30,7 +30,8 @@ applyWaterRate <- function(usage, baseFee, t1, t2, t3, t4) {
         ifelse(usage > 1000, 1000 * t1, usage * t1))
 }   
 
-## Try something like this:
+## Try something like this. Appears to be called a "rolling" join.
+##
 ## rev0625 <- projectConsumption(waterMeans, 2025, 6) %>%
 ##     mutate(readingDate=ymd("2025-06-27")) %>%
 ##     left_join(rates, join_by(rateCode,

@@ -232,7 +232,7 @@ if (cleanup) rm(readingTable19,
                 readingTable24,
                 readingTable25)
 
-cat("done with readingtable\n")
+cat("done with readingTable\n")
 
 ## Get the rate data and add them to the reading table.
 source("getRates.r");
