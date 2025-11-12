@@ -1,3 +1,6 @@
+library(tidyverse)
+library(readxl)
+
 ## A function to accept a month and year and create a data frame of
 ## read dates.  Using 'ifelse' instead of simple 'if' statements makes
 ## this harder to read, but allows it to be used in mutate()
@@ -35,12 +38,13 @@ makeReadDate <- function(dyear, dmonth, cycle) {
                            ifelse(dmonth==1 & cycle==2, dyear - 1, dyear),
                            ifelse(cycle==2,ifelse(dmonth==1, 12, dmonth - 1),
                                   dmonth),
-                           ifelse(cycle==1, 19,
-                           ifelse(cycle==2, 25,
-                           ifelse(cycle==3,  5,
-                           ifelse(cycle==4, 12,
-                           ifelse(cycle==5, 19,
-                           ifelse(cycle==6, 19, 19)))))))));
+                           case_when(cycle==1 ~ 19,
+                                     cycle==2 ~ 25,
+                                     cycle==3 ~  5,
+                                     cycle==4 ~ 12,
+                                     cycle==5 ~ 19,
+                                     cycle==6 ~ 19,
+                                     .default=19))));
 }
 ## This is basically the same function as above, but since the target
 ## format is a floating point number, we skip the as_date(), for speed.
@@ -48,12 +52,13 @@ makeReadDateDirect <- function(dyear, dmonth, cycle) {
 
     return(((ifelse(dmonth==1 & cycle==2, dyear - 1, dyear) - 2019) * 12) +
            (ifelse(cycle==2,ifelse(dmonth==1, 12, dmonth - 1), dmonth) - 6) +
-           ((ifelse(cycle==1, 19,
-             ifelse(cycle==2, 25,
-             ifelse(cycle==3,  5,
-             ifelse(cycle==4, 12,
-             ifelse(cycle==5, 19,
-             ifelse(cycle==6, 19, 19))))))) - 1)/
+           ((case_when(cycle==1 ~ 19,
+                       cycle==2 ~ 25,
+                       cycle==3 ~  5,
+                       cycle==4 ~ 12,
+                       cycle==5 ~ 19,
+                       cycle==6 ~ 19,
+                       .default=19)) - 1)/
         (ifelse(ifelse(cycle==2,ifelse(dmonth==1, 12, dmonth - 1), dmonth) %in% c(1,3,5,7,8,10,12), 31,
             ifelse(ifelse(cycle==2,ifelse(dmonth==1, 12, dmonth - 1), dmonth) == 2, 28, 30))));
 }
@@ -85,3 +90,6 @@ rev0725 <- projectConsumption(waterMeans, 2025, 7) %>%
 
 
 ##waterResid %>% filter(readingDate > mdy("4/30/2025")) %>% mutate(readingDate = readingDate %m+% months(1), billDate = billDate %m+% months(1))
+
+fy26 <- read_excel("data/FY26\ Water\ and\ Irrigation\ Sales.xlsx") %>%
+    as_tibble()
