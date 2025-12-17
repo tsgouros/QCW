@@ -13,10 +13,11 @@ rateCodes <- read.csv("data/rateData/BIF005 Rate Report.csv",
 ## table, adding a "validUntilDate" to each row, according to which
 ## file it came from. As more rates are approved, they can be added to
 ## this rbind command.
+## "validUntilDate" references the billing date and not the reading date
 rates <- rbind(
     read_excel("data/rateData/rate-fee-and-tiers-superseded-2025-08-27.xlsx",
                range="A1:H62") %>%
-    mutate(rateSchedule=1,validUntilDate=ymd("2025-08-26")),
+    mutate(rateSchedule=1,validUntilDate=ymd("2025-10-06")),
     read_excel("data/rateData/rate-fee-and-tiers-updated-2025-09-01.xlsx",
                range="A1:H62") %>%
     mutate(rateSchedule=2,validUntilDate=ymd("2100-01-01")))
