@@ -1,7 +1,10 @@
 library(readxl)
 
-#rev24 <- read_excel("data/revenueData/FY24 Water and Irrigation Sales.xlsx") 
-#rev25 <- read_excel("data/revenueData/FY25 Water and Irrigation Sales.xlsx")
+rev24 <- read_excel("data/revenueData/FY24 Water and Irrigation Sales.xlsx") 
+rev25 <- read_excel("data/revenueData/FY25 Water and Irrigation Sales.xlsx")
+rev26 <- read_excel("data/revenueData/FY26 Water and Irrigation Sales.xlsx")
+
+
 
 actualRev <- rbind(rev24 %>% 
              pivot_longer(cols=c("JUL","AUG","SEP","OCT","NOV","DEC",
@@ -16,7 +19,16 @@ actualRev <- rbind(rev24 %>%
                           names_to="dmonth",values_to="revenue") %>%
              mutate(year=ifelse(dmonth %in% c("JUL","AUG","SEP",
                                               "OCT","NOV","DEC"),2024,2025),
-                    date=dmy(paste0("15-",dmonth,"-",year))))  %>%
+                    date=dmy(paste0("15-",dmonth,"-",year))),
+             rev26 %>% 
+             pivot_longer(cols=c("JUL","AUG","SEP","OCT","NOV","DEC",
+                                 "JAN","FEB","MAR","APR","MAY","JUN"),
+                          names_to="dmonth",values_to="revenue") %>%
+             mutate(year=ifelse(dmonth %in% c("JUL","AUG","SEP",
+                                              "OCT","NOV","DEC"),2025,2026),
+                    date=dmy(paste0("15-",dmonth,"-",year))) %>%
+             ## FY26 is not done yet, so filter out the future records.
+             filter(revenue > 0) )  %>%
     mutate(account=as.integer(ACCOUNT),
            rateCode=BILLCODE,
            description=DESCRIPTION,
@@ -25,8 +37,13 @@ actualRev <- rbind(rev24 %>%
     select(-ACCOUNT,-BILLCODE,-DESCRIPTION,-TOTAL) %>%
     select(account,rateCode,month,revenue,date,dmonth,year,description,total)
 
+## Note that each row of the rates data has a 'validUntilDate'. It's
+## set so that the most recent rate has a validUntilDate of 1/1/2100,
+## so the join here only has to choose the closest one in the future
+## from a given billDate.
 rev <- waterResid %>%
-    left_join(rates,by="rateCode") %>%
+    left_join(rates, join_by(rateCode, closest(billDate <= validUntilDate))) %>%
+    mutate(billMonth=convertDateToInteger(year(billDate),month(billDate))) %>%
     mutate(billAmount=applyWaterRate(consumption,baseFee,t1,t2,t3,t4),
            predBillAmount=applyWaterRate(predUsage,baseFee,t1,t2,t3,t4))
 
@@ -38,10 +55,10 @@ dateStrings <- rev %>%
                      dateString=paste0(month, "/", year)) %>%
     select(billMonth, dateString)
 
-dateStrings[26,1] <- 72;
-dateStrings[26,2] <- "6/2025";
+##dateStrings[26,1] <- 72;
+##dateStrings[26,2] <- "6/2025";
 
-breaks <- seq(48,72,3)
+breaks <- seq(48,max(rev$billMonth, na.rm=TRUE),3)
 
 labels <- dateStrings %>%
     filter(billMonth %in% breaks) %>%
@@ -50,7 +67,6 @@ labels <- dateStrings %>%
 
 revPlot <- rev %>%
 ##    filter(accountType=="Residential/Single Family") %>%
-    mutate(billMonth=convertDateToInteger(year(billDate),month(billDate))) %>%
     group_by(billMonth) %>%
     dplyr::summarize(billAmount=sum(billAmount,na.rm=TRUE),
                      predBillAmount=sum(predBillAmount,na.rm=TRUE)) %>%
