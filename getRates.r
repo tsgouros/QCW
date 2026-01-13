@@ -13,7 +13,13 @@ rateCodes <- read.csv("data/rateData/BIF005 Rate Report.csv",
 ## table, adding a "validUntilDate" to each row, according to which
 ## file it came from. As more rates are approved, they can be added to
 ## this rbind command.
-## "validUntilDate" references the billing date and not the reading date
+##
+## "validUntilDate" references the billing date and not the reading
+## date, but note that the date is set around a month *after* the
+## actual rate change. The department made a policy that no bills
+## should be partly one rate and partly another, so a rate change that
+## technically goes into effect on 8/27 is not actually completely
+## applied until the bills of 10/6 are sent out.
 rates <- rbind(
     read_excel("data/rateData/rate-fee-and-tiers-superseded-2025-08-27.xlsx",
                range="A1:H62") %>%
