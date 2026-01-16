@@ -97,3 +97,8 @@ errorPlot <- rev %>%
                        limits=c(47,NA),
                        name="")
 
+##Residential plot
+resplot <-rev %>% filter(waterUseSegment=="Residential") %>% 
+  mutate(imonth=convertDateToInteger(billYear,billMonth)) %>% group_by(imonth) %>%   
+  summarise(billAmount=sum(billAmount,na.rm=TRUE),predBillAmount=sum(predBillAmount,na.rm=TRUE)) %>%
+  ggplot() + geom_line(aes(x=imonth,y=billAmount),color="blue") + geom_line(aes(x=imonth,y=predBillAmount),color="red")
