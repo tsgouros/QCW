@@ -98,7 +98,19 @@ errorPlot <- rev %>%
                        name="")
 
 ##Residential plot
-resplot <-rev %>% filter(waterUseSegment=="Residential") %>% 
-  mutate(imonth=convertDateToInteger(billYear,billMonth)) %>% group_by(imonth) %>%   
+##Updated with x and y scale
+resPlot <-rev %>% filter(waterUseSegment=="Residential") %>% 
+  mutate(imonth=convertDateToInteger(year(billDate),month(billDate))) %>% group_by(imonth) %>%   
   summarise(billAmount=sum(billAmount,na.rm=TRUE),predBillAmount=sum(predBillAmount,na.rm=TRUE)) %>%
-  ggplot() + geom_line(aes(x=imonth,y=billAmount),color="blue") + geom_line(aes(x=imonth,y=predBillAmount),color="red")
+  ggplot() + geom_line(aes(x=imonth,y=billAmount),color="blue") + 
+  geom_line(aes(x=imonth,y=predBillAmount),color="red") +
+  scale_x_continuous(breaks=breaks,
+                     labels=labels,
+                     limits=c(47,NA),
+                     name="") +
+  scale_y_continuous(breaks=seq(0,4e6,1e6),
+                     labels=c("$0","$1M","$2M","$3M","$4M"),
+                     limits=c(0,4000000),
+                     name="Monthly Revenue") +
+  theme(axis.text.x = element_text(angle = 45, hjust=1.0, vjust=1.0)) 
+
