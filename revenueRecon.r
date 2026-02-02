@@ -114,3 +114,101 @@ resPlot <-rev %>% filter(waterUseSegment=="Residential") %>%
                      name="Monthly Revenue") +
   theme(axis.text.x = element_text(angle = 45, hjust=1.0, vjust=1.0)) 
 
+## Create summary table for July to December 2025 for the residential segment
+resTable <-rev %>% 
+  filter(waterUseSegment=="Residential") %>% 
+  mutate(billMonth=convertDateToInteger(year(billDate),month(billDate,))) %>%
+  group_by(billMonth) %>%   
+  filter(billMonth >= 73 & billMonth <=78) %>%
+  summarise(billAmount=sum(billAmount,na.rm=TRUE),
+            predBillAmount=sum(predBillAmount,na.rm=TRUE)) %>%
+  mutate(error=billAmount-predBillAmount,
+         errorPercent=((billAmount/predBillAmount)-1))
+
+## Create a list of Diversified rate codes
+## This segment of customers did not have a rate increase in the fall of 2025. 
+## Useful group for hypothesis testing.
+diversified <- c("WD1","LD1","WK1","WD2","LD2","WD3","LD3","WD4","LD4","WD6")
+
+## Create a residential summary table without diversified
+## Filtered on July thru December 2025 on line123
+resTableNoDiV <-rev %>% 
+  filter(waterUseSegment=="Residential"&!(rateCode%in%diversified)) %>% 
+  mutate(billMonth=convertDateToInteger(year(billDate),month(billDate))) %>%
+  group_by(billMonth) %>%  
+  filter(billMonth >= 73 & billMonth <=78) %>%
+  summarise(billAmount=sum(billAmount,na.rm=TRUE),
+            predBillAmount=sum(predBillAmount,na.rm=TRUE)) %>%
+  mutate(error=billAmount-predBillAmount,
+         errorPercent=((billAmount/predBillAmount)-1))
+
+## Create a residential summary table for only diversified
+## Filtered on July thru December 2025 on line123
+resTableDiVOnly <-rev %>% 
+  filter(waterUseSegment=="Residential"&(rateCode%in%diversified)) %>% 
+  mutate(billMonth=convertDateToInteger(year(billDate),month(billDate))) %>%
+  group_by(billMonth) %>%  
+  filter(billMonth >= 73 & billMonth <=78) %>%
+  summarise(billAmount=sum(billAmount,na.rm=TRUE),
+            predBillAmount=sum(predBillAmount,na.rm=TRUE)) %>%
+  mutate(error=billAmount-predBillAmount,
+         errorPercent=((billAmount/predBillAmount)-1))
+
+## Create summary table for July to December 2025 for the landscape segment
+lanTable <-rev %>% 
+  filter(waterUseSegment=="Landscape") %>% 
+  mutate(billMonth=convertDateToInteger(year(billDate),month(billDate,))) %>%
+  group_by(billMonth) %>%   
+  filter(billMonth >= 73 & billMonth <=78) %>%
+  summarise(billAmount=sum(billAmount,na.rm=TRUE),
+            predBillAmount=sum(predBillAmount,na.rm=TRUE)) %>%
+  mutate(error=billAmount-predBillAmount,
+         errorPercent=((billAmount/predBillAmount)-1))
+
+## Create a landscape summary table without diversified
+## Filtered on July thru December 2025 on line123
+lanTableNoDiV <-rev %>% 
+  filter(waterUseSegment=="Landscape"&!(rateCode%in%diversified)) %>% 
+  mutate(billMonth=convertDateToInteger(year(billDate),month(billDate))) %>%
+  group_by(billMonth) %>%  
+  filter(billMonth >= 73 & billMonth <=78) %>%
+  summarise(billAmount=sum(billAmount,na.rm=TRUE),
+            predBillAmount=sum(predBillAmount,na.rm=TRUE)) %>%
+  mutate(error=billAmount-predBillAmount,
+         errorPercent=((billAmount/predBillAmount)-1))
+
+## Create a landscape summary table for only diversified
+## Filtered on July thru December 2025 on line123
+lanTableDiVOnly <-rev %>% 
+  filter(waterUseSegment=="Landscape"&(rateCode%in%diversified)) %>% 
+  mutate(billMonth=convertDateToInteger(year(billDate),month(billDate))) %>%
+  group_by(billMonth) %>%  
+  filter(billMonth >= 73 & billMonth <=78) %>%
+  summarise(billAmount=sum(billAmount,na.rm=TRUE),
+            predBillAmount=sum(predBillAmount,na.rm=TRUE)) %>%
+  mutate(error=billAmount-predBillAmount,
+         errorPercent=((billAmount/predBillAmount)-1))
+
+## Plot errors for residential; without diversified and diversified only.
+## Diversified rates did not increase in the fall of 2025.
+## Supports null hypothesis rates that increased had similar behavior as those that did not.
+## Error % follows trend; therefore price elasticity was likely not a major factor.
+plotResRateIncrease <- ggplot() +
+          geom_line(data=resTableNoDiV,
+                    aes(x=billMonth,y=(errorPercent),color="No DIV")) +
+          geom_line(data=resTableDiVOnly,
+                    aes(x=billMonth,y=(errorPercent),color="DIV Only")) +
+          labs(title="Residential- Error % of Rates w/ Increase vs. Diversified",
+               x="July thru December 2025",
+               y="Error Percent")
+
+## Plot errors for residential and landscape segments
+## Supports hypothesis weather was major factor
+plotResVsLandscape <- ggplot() +
+  geom_line(data=resTable,
+            aes(x=billMonth,y=(errorPercent),color="Residential")) +
+  geom_line(data=lanTable,
+            aes(x=billMonth,y=(errorPercent),color="Landscape")) +
+  labs(title="Residential vs. Landscape Segment Error %",
+       x="July thru December 2025",
+       y="Error Percent")
