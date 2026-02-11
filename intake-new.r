@@ -211,13 +211,43 @@ readingTable25 <- read.csv("data/2025 BIF016 Report.csv",
          previousReadingMonth=month(previousReadingDate)) %>%
   filter(canceled=="No");
 
+readingTable26 <- read.csv("data/2026 BIF016 Report.csv",
+                           col.names=c("billNumber", "account", "service",
+                                       "meter","readType","currentReading",
+                                       "readStatus", "billTyple", "cycle",
+                                       "book", "readingDate", "sequenceNumber",
+                                       "peakTime", "readingID", "processed", "supplier",
+                                       "customer", "previousReading", "notes", "consumption",
+                                       "multiplier1", "multiplier2", "units", "mv90Channel",
+                                       "lossFactor","serviceID","previousReadingDate",
+                                       "workerCode", "interval", "billingInterval", "serviceOrder",
+                                       "meterTroubleCode1", "meterTroubleCode2", "validated", "days",
+                                       "demandFactor", "canceled", "serviceMultiplier1",
+                                       "serviceMultiplier2", "consumptionDiscount", "discountCode",
+                                       "allocation", "factor", "overrideconsumption", "useOverride",
+                                       "useOverrideReason", "billedConsumption", "isbilled")) %>%
+  as_tibble() %>%
+  separate(readingDate, sep=" ", into=c("readingDate","time","M"),
+           fill="right") %>%
+  select(-time,-M) %>%
+  separate(previousReadingDate, sep=" ",
+           into=c("previousReadingDate","time","M"), fill="right") %>%
+  select(-time,-M) %>%
+  mutate(readingDate=mdy(readingDate),
+         previousReadingDate=mdy(previousReadingDate),
+         readingMonth=month(readingDate),
+         readingYear=year(readingDate),
+         previousReadingMonth=month(previousReadingDate)) %>%
+  filter(canceled=="No");
+
 readingTable <- rbind(readingTable19,
                       readingTable20,
                       readingTable21,
                       readingTable22,
                       readingTable23,
                       readingTable24,
-                      readingTable25) %>%
+                      readingTable25,
+                      readingTable26) %>%
     filter(readingDate > mdy("4/1/2023")) %>%
     mutate(consumption=as.numeric(consumption),
            previousReading=as.numeric(previousReading),
@@ -230,7 +260,8 @@ if (cleanup) rm(readingTable19,
                 readingTable22,
                 readingTable23,
                 readingTable24,
-                readingTable25)
+                readingTable25,
+                readingTable26)
 
 cat("done with readingTable\n")
 
@@ -416,13 +447,33 @@ billTable25 <-
          billMonth=month(billDate),
          billYear=year(billDate));
 
+billTable26 <-
+  read.csv("data/2026 BIF951 Report.csv",
+           col.names=c("billNumber","billDate","accountType",
+                       "needsPayment","batchID","bif951pk",
+                       "billPrint","billGroup","billStat","billType",
+                       "chgBill","cycle","book","cancel","account",
+                       "customer","customerAcctID","dueDate",
+                       "paymentProfile","processed","serAdd",
+                       "balanceForward","previousBilling",
+                       "sinceLastBill","currentTrans","cancelledBilling",
+                       "amountDue","addressType","address1",
+                       "address2","address3","address4",
+                       "address5","address6"),
+           fileEncoding="latin1") %>%
+  as_tibble() %>%
+  mutate(billDate=mdy(billDate),
+         billMonth=month(billDate),
+         billYear=year(billDate));
+
 billTable <- rbind(billTable19,
                    billTable20,
                    billTable21,
                    billTable22,
                    billTable23,
                    billTable24,
-                   billTable25) %>%
+                   billTable25,
+                   billTable26) %>%
     filter(billDate > mdy("5/1/2023")) %>%
     as_tibble()
 
@@ -432,6 +483,8 @@ if (cleanup) rm(billTable19,
                 billTable22,
                 billTable23,
                 billTable24,
-                billTable25)
+                billTable25,
+                billTable26)
 
 cat("done with billTable\n");
+
