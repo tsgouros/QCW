@@ -230,7 +230,8 @@ read.pinal.data <- function(fileName, desiredParcels, returnMatches=TRUE) {
     }   
 }
 
-pinal <- read.pinal.data("data/countyData/pinal/Town of Queen Creek pools 2025 03.06.25.xlsx",
+## Updated March 2026 with new data from Pinal County. They provided the same format.
+pinal <- read.pinal.data("data/countyData/pinal/Town of Queen Creek pools 2026 03.03.26.xlsx",
                          unique((addressTable %>% filter(taxProfile==4|taxProfile==5))$parcel),
                          returnMatches=TRUE)
 
@@ -244,6 +245,8 @@ cat("Finished reading Pinal County data.\n");
 ## county data.  Note also that the data files should really be an
 ## input here, but they are complicated, so the file names are
 ## hard-coded in.
+
+##Old script for reading Maricopa dat format
 read.maricopa.data <- function(dataDir, desiredParcels, returnMatches=TRUE) {
 
     # returns string w/o leading or trailing whitespace
@@ -430,72 +433,95 @@ cat("Finished reading Maricopa County data.\n");
 prop <- rbind(pinal, mari);
 
 
-##import r116 residential files from Maricopa County Assessor. Complete files are in the OWN version 
-##these three data files are not in the same format so the select function after each read makes the data frame consistent
+## 2026 Update for Maricopa County data. https://www.mcassessor.maricopa.gov/page/data_sales/ Secured Master, Residential and Commercial Master.
+## Download Secure Master and Residential Master. Secured Master will be updated next in August 2026. Residential Master is updated monthly.
+
+##Read the Secure Master txt files
+
+securedMasterNames <- c("parcel", "propertyStatus", "propertyUseCode",
+              "taxAreaCode", "orgExemptionCode",
+              "orgExemptIndicator", "section", "town",
+              "range", "sectionQuarter", "lot", "block",
+              "tract", "streetNum", "streetDir","streetName",
+              "streetType", "streetPostDir", "suite",
+              "city", "zip", "ownersName", "ownersDeed",
+              "ownersDeedDate", "feesName", "feesDeed",
+              "feesDeedDate","ownersAddr1stLine",
+              "ownersAddr2ndLine","ownersCity","ownersState",
+              "ownersZipCode", "ownerCountry", "lpvPercent",
+              "lpvAmount", "lpvAssessedValue", "fcv",
+              "landAssessmentPerc", "landValue",
+              "imprAssessmentPerc", "impValue",
+              "widvetIndicator", "widvetlpvexAssessedValue",
+              "widvetfcvxAssessedValue", "sqFootage",
+              "valSource", "overrideCode", "landClass1st",
+              "landRatio1st", "land2nd", "landRatio2nd",
+              "land3rd", "landRatio3rd", "land4th",
+              "landRatio4th", "improvementClass1st",
+              "improvedmentRatio1st", "improvement2nd",
+              "improvementRatio2nd", "improvement3rd",
+              "improvementRatio3rd", "improvement4th",
+              "improvementRatio4th", "landAreaType",
+              "neighborhoodCode", "marketAreaCode", "mcr",
+              "subdivision", "mailingDate", "economicUnit",
+              "numberofUnits", "districtCode1",
+              "districtCodeValue1", "districtCode2",
+              "districtCodeValue2", "districtCode3",
+              "disctrictCodeValue3", "districtCode4",
+              "districtCodeValue4", "districtCode5",
+              "districtCodeValue5", "districtCode6",
+              "districtCodeValue6", "lglDesc")
+
+SM1 <- read.delim("data/countyData/maricopa/Secured_Master_1.txt",
+                    header= FALSE, sep ="|", dec = ".", quote="~",
+                    col.names=securedMasterNames)
+
+SM2 <- read.delim("data/countyData/maricopa/Secured_Master_2.txt",
+                  header= FALSE, sep ="|", dec = ".", quote="~",
+                  col.names=securedMasterNames)
+
+SM3 <- read.delim("data/countyData/maricopa/Secured_Master_3.txt",
+                  header= FALSE, sep ="|", dec = ".", quote="~",
+                  col.names=securedMasterNames)
+SM4 <- read.delim("data/countyData/maricopa/Secured_Master_4.txt",
+                  header= FALSE, sep ="|", dec = ".", quote="~",
+                  col.names=securedMasterNames)
+
+SM5 <- read.delim("data/countyData/maricopa/Secured_Master_5.txt",
+                  header= FALSE, sep ="|", dec = ".", quote="~",
+                  col.names=securedMasterNames)
+
+SM6 <- read.delim("data/countyData/maricopa/Secured_Master_6.txt",
+                  header= FALSE, sep ="|", dec = ".", quote="~",
+                  col.names=securedMasterNames)
+
+SM7 <- read.delim("data/countyData/maricopa/Secured_Master_7.txt",
+                  header= FALSE, sep ="|", dec = ".", quote="~",
+                  col.names=securedMasterNames)
+
+SM8 <- read.delim("data/countyData/maricopa/Secured_Master_8.txt",
+                  header= FALSE, sep ="|", dec = ".", quote="~",
+                  col.names=securedMasterNames)
 
 
+securedMaster <- rbind(SM1, SM2, SM3, SM4, SM5, SM6, SM7, SM8)
+
+if (cleanup) rm(SM1, SM2, SM3, SM4, SM5, SM6, SM7, SM8)
+
+
+##Read the Residential Master
                               
-residentialCounty <- read.delim("data/countyData/maricopa/R116_OWN_2025.txt", header= FALSE, sep ="|", dec = ".", quote="~",
+residentialMaster <- read.delim("data/countyData/maricopa/Residential_Master.txt", header= FALSE, sep ="|", dec = ".", quote="~",
                                 col.names=c("parcel", "proportionComplete", "class", "storyCount", "airConType", 
                                             "heatingType", "bathroomFixtures", "extWallMaterial", "roofMaterial", "roofStyle",
                                             "constructionYear", "livingSqft", "1stFloor", "2ndFloor", "3rdFloor",
                                             "basement", "parkCode", "patios", "poolArea", "salePrice", "saleDate",
                                             "addedArea", "detachArea", "puc", "ownersName", "ownersAddr1", "ownersAddr2",
                                             "ownerCity", "ownersState", "ownersZipCode", "ownerCountry", "streetNum",
-                                            "streetDir1", "streetName1", "streetType1", "streetPostDir1", "suite1", "city1", "zip",
-                                            "na1", "na2", "na3", "na4")) %>%
-                              select(-na1,-na2,-na3,-na4) %>%
+                                            "streetDir1", "streetName1", "streetType1", "streetPostDir1", "suite1", "city1", "zip")) %>%
                               as_tibble();
 
-
-##import r117 commercial data ##
-
-
-commercial <- read.delim("data/countyData/maricopa/R117_2025.txt", header= FALSE, sep ="|", quote = "~", dec = ".",
-                         col.names=c("countyID", "parcel", "improvementID", "occNum", "occRank", "structClass",
-                                     "occDescr", "improvementFcv", "stories", "wallHeight", "gfPermeter",
-                                     "gfArea", "floorArea", "constructionYear", "pctComplete", "pctObsolete",
-                                     "pctModern", "pctPhysical", "pctOwnership", "subMktAdj"));
-
-## 1770 is the premium secured master data to use. QC area parcels are in tax roll 6 in the 2025 file ##
-
-r1770 <- read.delim("data/countyData/maricopa/R1170_SecMaster_2025_TAX_ROLL_6.txt",
-                    header= FALSE, sep ="|", dec = ".", quote="~",
-                    col.names=c("parcel", "propertyStatus", "propertyUseCode",
-                                "taxAreaCode", "orgExemptionCode",
-                                "orgExemptIndicator", "section", "town",
-                                "range", "sectionQuarter", "lot", "block",
-                                "tract", "streetNum", "streetDir","streetName",
-                                "streetType", "streetPostDir", "suite",
-                                "city", "zip", "ownersName", "ownersDeed",
-                                "ownersDeedDate", "feesName", "feesDeed",
-                                "feesDeedDate","ownersAddr1stLine",
-                                "ownersAddr2ndLine","ownersCity","ownersState",
-                                "ownersZipCode", "ownerCountry", "lpvPercent",
-                                "lpvAmount", "lpvAssessedValue", "fcv",
-                                "landAssessmentPerc", "landValue",
-                                "imprAssessmentPerc", "impValue",
-                                "widvetIndicator", "widvetlpvexAssessedValue",
-                                "widvetfcvxAssessedValue", "sqFootage",
-                                "valSource", "overrideCode", "landClass1st",
-                                "landRatio1st", "land2nd", "landRatio2nd",
-                                "land3rd", "landRatio3rd", "land4th",
-                                "landRatio4th", "improvementClass1st",
-                                "improvedmentRatio1st", "improvement2nd",
-                                "improvementRatio2nd", "improvement3rd",
-                                "improvementRatio3rd", "improvement4th",
-                                "improvementRatio4th", "landAreaType",
-                                "neighborhoodCode", "marketAreaCode", "mcr",
-                                "subdivision", "mailingDate", "economicUnit",
-                                "numberofUnits", "districtCode1",
-                                "districtCodeValue1", "districtCode2",
-                                "districtCodeValue2", "districtCode3",
-                                "disctrictCodeValue3", "districtCode4",
-                                "districtCodeValue4", "districtCode5",
-                                "districtCodeValue5", "districtCode6",
-                                "districtCodeValue6", "lglDesc", "na"));
-
-merged <- merge(r1770,residentialCounty, by = "parcel")
+merged <- merge(securedMaster,residentialMaster, by = "parcel")
 
 maricopa <- tibble(parcel=merged$parcel,
                    type=merged$propertyUseCode,
@@ -532,11 +558,11 @@ maricopa <- tibble(parcel=merged$parcel,
                    pool=ifelse(is.na(merged$poolArea),FALSE,TRUE),
                    yearbuilt=merged$constructionYear);
 
-if (cleanup) rm(merged,r1770,residentialCounty);
+if (cleanup) rm(merged,securedMaster,residentialMaster);
 
 filtered.maricopa <- filter(maricopa, parcel %in% addressTable$parcel)
 
 prop <- rbind(pinal, filtered.maricopa);
 
-if (cleanup) rm(pinal,mari,filtered_maricopa;
+if (cleanup) rm(pinal, maricopa, filtered.maricopa)
 
