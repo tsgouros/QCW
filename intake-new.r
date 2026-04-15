@@ -289,7 +289,7 @@ addressTable <- read.csv("data/Updated BIF002 Report.csv",
                                      "streetPostDir","taxProfile",
                                      "routeComment","subdivision",
                                      "waterZone","trashZone","extRef",
-                                     "collectedBy","TAZ","GRD")) %>%
+                                     "collectedBy","TAZ_2019","GRD")) %>%
     as_tibble();
 
 cat("done with addressTable\n");
