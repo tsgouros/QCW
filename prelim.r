@@ -116,6 +116,7 @@ waterMeans <- waterTable %>%
                      revenueClass=first(revenueClass),
                      cycle=last(cycle),
                      rateCode=last(rateCode),
+                     TAZ_2019=first(TAZ_2019),
                      .groups="drop") %>%
     unpack(tmp)
 
