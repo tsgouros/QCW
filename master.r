@@ -95,7 +95,7 @@ if (assembleWaterTable) {
                   by="customer") %>%
         left_join(addressTable %>%
                   select(account, subdivision, latitude, longitude,
-                         taxProfile, parcel),
+                         taxProfile, parcel, TAZ, GRD),
                   by="account") %>%
         mutate(waterUseSegment=ifelse(service=="Irrigation",
                                       "Irrigation",
