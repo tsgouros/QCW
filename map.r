@@ -32,13 +32,14 @@ tazNames <- c("1940","1583","2851","1585","1944","1952","1589","1582",
               "2196","2000","2431","2079")
 
 ## Step 2: Make some data to look at, and group it by the TAZ regions.
-wmAreaData <- water.means %>%
+wmAreaData <- waterMeans %>%
     ## Select which users we want to see.
     filter(waterUseSegment=="Residential", parcel != "") %>%
     left_join(prop, by="parcel", relationship="many-to-one") %>%
     ## Do whatever analysis needs to happen as a function of the TAZ.
     group_by(TAZ_2019) %>%
-    dplyr::summarize(myMean=mean(off,na.rm=TRUE))
+    dplyr::summarize(myMean=mean(log10(max(1,amp)),na.rm=TRUE)) %>%
+    mutate(TAZ_2019=as.character(TAZ_2019))
 
 ## Step 3, map the data. Note that "tazShapes" is a data frame that is
 ## also a real geographic object at this point, while "wmAreaData" is
