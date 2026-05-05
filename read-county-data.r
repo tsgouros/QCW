@@ -555,14 +555,22 @@ maricopa <- tibble(parcel=merged$parcel,
                    propertycity=merged$city,
                    county="maricopa",
                    poolarea=merged$poolArea,
-                   pool=ifelse(is.na(merged$poolArea),FALSE,TRUE),
-                   yearbuilt=merged$constructionYear);
+                   yearbuilt=merged$constructionYear) %>%
+    mutate(poolarea=ifelse(poolarea==0, NA, poolarea),
+           pool=ifelse((is.na(poolarea))|(poolarea==0), FALSE, TRUE))
 
 if (cleanup) rm(merged,securedMaster,residentialMaster);
 
-filtered.maricopa <- filter(maricopa, parcel %in% addressTable$parcel)
+## Only keep the Maricopa properties that have a parcel number in our
+## addressTable. Also, there are some odd propertycity entries, so
+## just remove them.
+prop <- maricopa %>% 
+    filter(parcel %in% addressTable$parcel) %>%
+    rbind(pinal) %>%
+    filter(propertycity != "PHOENIX") %>%
+    mutate(propertycity = ifelse(is.na(propertycity),"N/A",
+                                 str_to_upper(propertycity))) %>%
+    distinct()
 
-prop <- rbind(pinal, filtered.maricopa);
-
-if (cleanup) rm(pinal, maricopa, filtered.maricopa)
+if (cleanup) rm(pinal, maricopa)
 
