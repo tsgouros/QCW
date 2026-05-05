@@ -14,18 +14,11 @@ library(ggrepel)
 ## Getting the more recent billing data.
 updateBillingData <- TRUE;
 ## ... and the county data.
-updateCountyData <- FALSE;
+updateCountyData <- TRUE;
 ## Assemble the big waterTable.
 assembleWaterTable <- TRUE;
 ## Doing the sampling and preliminary processing of the big pile of data.
 updateRegression <- TRUE;
-## We're going to make some projections of usage, and probably
-## revenue, too so we need the location data in an easy-to-use format.
-updateLocationData <- TRUE;
-
-
-## Creating the model with account data and growth projections
-## incorporateGrowth <- FALSE;
 
 ## Output graphics
 ## saveGraphs <- FALSE;
@@ -133,30 +126,6 @@ if (updateRegression) {
 
 ## Bring in precipitation and temperature records
 ##source("rain.r")
-
-## Add location data to the waterTable and waterMeans tables. This is
-## both the property data from the county assessors and the TAZ
-## data. The TAZ data is essential because we need some area within
-## which to estimate usage and do our sampling.
-if (updateLocationData) {
-    cat("update location data\n");
-    TAZbyParcel <- read.csv("data/Permits-by-parcel.csv",header=TRUE) %>%
-        as_tibble() %>%
-        rowwise() %>%
-        ## Some large parcels overlap multiple TAZs. We only use the
-        ## first, somewhat arbitrarily.
-        mutate(TAZ_2019=gsub("/.*$","",TAZ_2019)) 
-
-    locData <- TAZbyParcel %>%
-        select(parcel, TAZ_2019) %>%
-        filter(parcel != "") %>%
-        distinct()
-
-    waterMeans <- waterMeans %>% left_join(locData, by="parcel")
-    waterResid <- waterResid %>% left_join(locData, by="parcel")
-} else {
-    cat("skip update location data\n");
-}
 
 
 
